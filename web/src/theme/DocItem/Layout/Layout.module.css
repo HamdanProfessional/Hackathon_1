@@ -1,0 +1,38 @@
+/* DocItem Layout Wrapper Styles */
+
+.docItemWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Personalize Section */
+.personalizeSection {
+  width: 100%;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+/* Main Content Area */
+.mainContent {
+  width: 100%;
+  flex: 1;
+}
+
+/* Utility: Hide component on small screens if needed */
+@media (max-width: 768px) {
+  .docItemWrapper {
+    flex-direction: column;
+  }
+
+  .personalizeSection {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .personalizeSection {
+    margin-bottom: 12px;
+  }
+}

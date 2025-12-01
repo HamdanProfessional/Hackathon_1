@@ -139,9 +139,9 @@ Repository root contains three service directories:
 
 **Purpose**: Integrate all UI components into Docusaurus layout
 
-- [ ] T041 Run `npm run swizzle @docusaurus/theme-classic DocItem/Layout -- --wrap` in `web/` to create theme override
-- [ ] T042 Edit `web/src/theme/DocItem/Layout/index.tsx` to import and render `LangSwitch`, `PersonalizeBtn`, `ChatWidget` components
-- [ ] T043 Position components: `LangSwitch` (top-right), `PersonalizeBtn` (below page title), `ChatWidget` (floating bottom-right)
+- [X] T041 Run `npm run swizzle @docusaurus/theme-classic DocItem/Layout -- --wrap` in `web/` to create theme override
+- [X] T042 Edit `web/src/theme/DocItem/Layout/index.tsx` to import and render `LangSwitch`, `PersonalizeBtn`, `ChatWidget` components
+- [X] T043 Position components: `LangSwitch` (top-right), `PersonalizeBtn` (below page title), `ChatWidget` (floating bottom-right)
 
 ---
 
