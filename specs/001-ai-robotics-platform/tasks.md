@@ -149,8 +149,8 @@ Repository root contains three service directories:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T044 [P] Create `api/scripts/validate_links.py` to check markdown files for broken internal/external links (per spec FR-014)
-- [ ] T045 [P] Create `api/scripts/code_linter.py` (bonus) to lint code examples in documentation
+- [X] T044 [P] Create `api/scripts/validate_links.py` to check markdown files for broken internal/external links (per spec FR-014)
+- [X] T045 [P] Create `api/scripts/code_linter.py` (bonus) to lint code examples in documentation
 - [ ] T046 [P] Add `.env.example` files in `api/`, `auth/`, `web/` with placeholder environment variables
 - [ ] T047 [P] Create `README.md` at repository root with monorepo setup instructions
 - [ ] T048 [P] Configure CORS in `api/src/main.py` to allow requests from `web` development server
