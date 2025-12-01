@@ -183,3 +183,59 @@ Phase 5: Bonus Skills
 3.  **Final Verification:** Run `scripts/ingest.py` to ensure the vector DB is populated, then run `npm build` in `/web` to verify the static site generation succeeds."
 
 ---
+
+/sp.implement "Execute the full End-to-End Implementation Plan (Phases 1-5) to establish the Monorepo, Backend, Content pipeline, and Frontend integration.
+
+**Action: Generates the following file structure and codebase:**
+
+### 1. Infrastructure & Config (Phase 1)
+*   **Create Root Files:**
+    *   `.env.example`: Template for keys (`GEMINI_API_KEY`, `OPENAI_API_BASE`, `DATABASE_URL`, `QDRANT_URL`, `BETTER_AUTH_SECRET`).
+    *   `requirements.txt`: Python deps (`fastapi`, `uvicorn`, `openai-agents`, `qdrant-client`, `asyncpg`, `python-dotenv`).
+    *   `auth/package.json`: Node deps (`better-auth`, `express`, `pg`, `cors`, `dotenv`).
+*   **Scaffold Commands:** Assume directories `/api`, `/auth`, `/web` (Docusaurus), and `/scripts` exist.
+
+### 2. Content Generation Pipeline (Phase 2)
+*   **Create `scripts/scaffold_content.py`:**
+    *   Define a list of 4 Modules (ROS2, Simulation, Isaac Sim, VLA).
+    *   Function to generate 4 Markdown files in `web/docs/en/` with proper Docusaurus frontmatter and placeholders.
+    *   Function to generate 4 Markdown files in `web/docs/ur/` that translates descriptions to pseudo-Urdu but **strictly preserves** English technical terms and code blocks.
+
+### 3. The Brain: Backend & Agent (Phase 3)
+*   **Create `api/core/config.py`:** Load env vars using Pydantic Settings.
+*   **Create `api/agent.py`:**
+    *   Initialize `openai-agents` SDK with `Google Gemini 1.5 Flash` (via OpenAI compatibility).
+    *   Define `Agent` with instructions: 'You are a Robotics Professor. Answer based on the textbook.'
+    *   (Placeholder): Define `search_textbook` tool skeleton.
+*   **Create `api/main.py`:**
+    *   `POST /chat`: Route user queries to `agent.run()`.
+    *   `POST /personalize`: Route content + `hardware_bg` to LLM for rewriting.
+*   **Create `scripts/ingest.py`:**
+    *   Script to read all `.md` files in `web/docs/en/`.
+    *   Chunk text and upsert to Qdrant Vector DB.
+
+### 4. Authentication & Frontend (Phase 4)
+*   **Create `auth/auth.config.ts`:**
+    *   Config `better-auth` with Postgres.
+    *   Add custom User schema field: `hardware_bg` (Enum: Laptop, Jetson, Cloud).
+*   **Create `auth/server.ts`:** Express server mounting the Auth handler on port 3001.
+*   **Create `web/src/utils/api.ts`:** Axios/Fetch wrapper for API (8000) and Auth (3001).
+*   **Create `web/src/components/PersonalizeBtn.tsx`:** React component that calls `/api/personalize` and updates the DOM.
+*   **Create `web/src/components/ChatWidget.tsx`:** Floating UI that calls `/api/chat`.
+
+### 5. Quality Assurance (Phase 5)
+*   **Create `scripts/validate_links.py`:** Scans Markdown for broken relative links.
+
+**Constraint:** Output the full code for these files. For standard scaffolding (like Docusaurus init), provide the shell commands."
+
+---
+
+/sp.checklist "Final Verification:
+1. Does the Monorepo structure match the Spec?
+2. Are English and Urdu docs present?
+3. Does `scripts/ingest.py` run without errors?
+4. Does the `/chat` endpoint respond using the Agent?
+5. Does the Auth server start and connect to Postgres?
+6. Does the Docusaurus build succeed with the custom components?"
+
+---
