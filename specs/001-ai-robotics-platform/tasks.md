@@ -50,9 +50,9 @@ Repository root contains three service directories:
 - [X] T010 Generate 5 English markdown chapters from `course_syllabus.md` in `web/docs/en/` (distribute across 4 modules)
 - [X] T011 Translate 5 English chapters to Urdu markdown in `web/docs/ur/` (parallel structure, technical terms in English)
 - [ ] T012 Configure Docusaurus in `web/docusaurus.config.js` with folder-based routing (NOT i18n plugin)
-- [ ] T013 Create `auth/src/db/schema.ts` with Drizzle ORM user schema including `hardware_bg` (RTX4090|Jetson|Laptop|Cloud) and `software_bg` fields
-- [ ] T014 Create `auth/src/auth.config.ts` with better-auth configuration using Drizzle adapter
-- [ ] T015 Create `api/src/services/db_service.py` for Neon Postgres connection using `@neondatabase/serverless` pattern
+- [X] T013 Create `auth/src/db/schema.ts` with Drizzle ORM user schema including `hardware_bg` (RTX4090|Jetson|Laptop|Cloud) and `software_bg` fields
+- [X] T014 Create `auth/src/auth.config.ts` with better-auth configuration using Drizzle adapter
+- [X] T015 Create `api/src/services/db_service.py` for Neon Postgres connection using `@neondatabase/serverless` pattern
 - [ ] T016 Create `api/scripts/ingest.py` to chunk `course_syllabus.md` (512 tokens, 128 overlap) and embed to Qdrant
 - [ ] T017 Run `api/scripts/ingest.py` to populate Qdrant with English content embeddings (module, chapter_title, language=en metadata)
 
