@@ -1,0 +1,25 @@
+# FastAPI Backend Dependencies
+# Physical AI & Humanoid Robotics Textbook Platform
+
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# AI & LLM
+openai>=1.0.0
+openai-agents>=0.1.0
+
+# Database & Storage
+psycopg2-binary>=2.9.9
+qdrant-client>=1.7.0
+
+# Data Validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+tiktoken>=0.5.0
+
+# HTTP & CORS
+httpx>=0.25.0

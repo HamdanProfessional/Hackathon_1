@@ -15,7 +15,7 @@
 
 3. **Configuration:**
    - **Secrets:** Load strictly from `.env`.
-   - **LLM Client:** Initialize `AsyncOpenAI` with `base_url=os.getenv('OPENAI_API_BASE')` and `api_key=os.getenv('GEMINI_API_KEY')`.
+   - **LLM Client:** Initialize `AsyncOpenAI` with `base_url=os.getenv('OPENAI_API_BASE')` and `api_key=os.getenv('GEMINI_API_KEY')` with Openai_Agents sdk.
    - **No Docker:** Deployment targets are Vercel (Web) and Render (API/Auth)."
 
 ---
@@ -115,11 +115,10 @@ Phase 5: Bonus Skills
 4. **Bonus 2 (Signup/Auth):** Covered by Phase 4 (Better-Auth + Hardware Background).
 5. **Bonus 3 (Personalization):** Covered by Phase 3 & 4 (API + Button).
 6. **Bonus 4 (Urdu):** Covered by Phase 2 & 4 (Static Files + Switcher).
-Confirm no logic gaps exist regarding the OpenAI Agents SDK usage with Gemini."
 
 ---
 
-/sp.implement "Execute Phase 1 & 2 immediately.
+/sp.implement "Execute Phase 1 & 2.
 1. **Environment:** Create the `.env` file with the keys provided in history.
 2. **Scaffold:** Create the `/web`, `/api`, and `/auth` folders.
 3. **Content:** Read `course_syllabus.md` and generate the English and Urdu markdown files in `web/docs/`.
@@ -128,15 +127,59 @@ Confirm no logic gaps exist regarding the OpenAI Agents SDK usage with Gemini."
 
 ---
 
-/sp.implement "Refine Content & Cleanup:
-1. **Cleanup:** Remove the default Docusaurus 'web/blog' directory and 'web/docs/intro.md'.
-2. **Populate English Content:** Read 'course_syllabus.md'. For each of the 12 chapters in 'web/docs/en/', replace the placeholder text with the actual details from the syllabus (Module Focus, Key Concepts, specific hardware requirements).
-3. **Populate Urdu Content:** Update the 12 files in 'web/docs/ur/' with the same structure. Translate generic descriptions to Urdu, but STRICTLY keep all Headers, Technical Terms (e.g., 'ROS 2', 'LiDAR'), and Code Blocks in English."
+/sp.implement "Phase 3: The Brain (Backend RAG & Agent)
+1.  **Dependencies:** Ensure `qdrant-client`, `openai-agents`, and `fastapi` are installed in the Python environment.
+2.  **Ingestion Script:** Create `scripts/ingest.py`.
+    -   **Logic:** Recursively read all `.md` files in `web/docs/en/`.
+    -   **Chunking:** Split text by headers or 500-character windows.
+    -   **Embedding:** Use the configured OpenAI/Gemini client to generate embeddings.
+    -   **Storage:** Upsert vectors + metadata (filename, header) to Qdrant collection `robotics_textbook`.
+3.  **Agent Tool:** In `api/agent.py`, define a function `search_textbook(query: str)` that performs a cosine similarity search on Qdrant and returns the top 3 chunks.
+4.  **Agent Setup:** Initialize the `openai-agents` `Agent` class:
+    -   **Model:** `google/gemini-1.5-flash` (via OpenAI compatibility layer).
+    -   **Instructions:** 'You are a robotics tutor. Use search_textbook to answer questions. Be concise.'
+    -   **Tools:** Attach `[search_textbook]`.
+5.  **API Endpoint:** Update `api/main.py` to include `POST /chat`.
+    -   **Input:** `{ message: str, history: list }`.
+    -   **Action:** Invoke `agent.run()`.
+    -   **Output:** `{ response: str }`."
 
 ---
 
-/sp.implement "Strict Cleanup & Content Population:
-1. **Remove Defaults:** Explicitly delete `web/docs/tutorial-basics.md`, `web/docs/tutorial-extras.md`, `web/docs/intro.md`, and the `web/blog` directory.
-2. **Read Source:** Read `course_syllabus.md` to extract the full details for Module 1, 2, 3, and 4.
-3. **Overwrite English Content:** For every file in `web/docs/en/` (e.g., `ros-2-nodes.md`), replace the current placeholder text with the actual corresponding section from the syllabus (including the 'Focus', 'Key Concepts', and specific bullet points).
-4. **Overwrite Urdu Content:** Do the same for `web/docs/ur/`, translating the explanatory text to Urdu but **keeping all English Headers, Technical Terms (ROS 2, URDF, Gazebo), and Code Blocks exactly as they are**."
+/sp.implement "Phase 4a: Authentication Infrastructure
+1.  **Node Service:** In `/auth`, ensure `package.json` includes `better-auth`, `pg`, and `dotenv`.
+2.  **Schema Configuration:** Create `/auth/auth.config.ts`.
+    -   **Database:** Connect to the Neon Postgres URL from `.env`.
+    -   **User Model:** Extend the default schema to include `hardware_bg` (String/Enum: 'RTX4090', 'Jetson', 'Laptop', 'Cloud').
+    -   **Providers:** Enable `username/password` or `email/password` credential provider.
+3.  **Server:** Create `/auth/server.ts` to run the auth server on port 3001 (or separate route if using Next.js, but standard Node server for this stack).
+4.  **Database Sync:** Run the better-auth migration command to push the schema to Neon."
+
+---
+
+/sp.implement "Phase 4b: Frontend Interactivity & Integration
+1.  **API Client:** Create `web/src/utils/api.ts` to handle requests to the Python API (`localhost:8000`) and Auth API (`localhost:3001`). Include interceptors to attach the session token if available.
+2.  **Personalize Component:** Create `web/src/components/PersonalizeButton.tsx`.
+    -   **UI:** A button labeled 'Personalize for [User Hardware]'.
+    -   **Logic:** On click, extract the main markdown content from the DOM. `POST` to `api/personalize` with `{ content, hardware_bg }`.
+    -   **Effect:** Replace the DOM text with the streaming response from the LLM.
+3.  **Chat Widget:** Create `web/src/components/ChatWidget.tsx`.
+    -   **UI:** Floating Action Button (bottom-right). Expands to a chat window.
+    -   **Logic:** Maintain local chat state. `POST` to `api/chat`. Display 'Thinking...' while waiting.
+4.  **Docusaurus Integration:**
+    -   **Swizzle:** Run `docusaurus swizzle @docusaurus/theme-classic DocItem/Layout --wrap`.
+    -   **Wrapper:** Edit `web/src/theme/DocItem/Layout/index.js` (or `.tsx`).
+    -   **Render:** Inject `<PersonalizeButton />` at the top of the content area and `<ChatWidget />` globally."
+
+---
+
+/sp.implement "Phase 5: Bonus Skills (Quality Assurance)
+1.  **Link Validator:** Create `scripts/validate_links.py`.
+    -   **Goal:** Ensure no broken relative links in the documentation.
+    -   **Logic:** Regex scan all `[text](path)` in `web/docs/`. Check if the target file exists. Print a report.
+2.  **Code Linter:** Create `scripts/lint_code.py`.
+    -   **Goal:** Ensure code blocks in the textbook are valid.
+    -   **Logic:** Extract python code blocks from Markdown. Run `pylint --errors-only` on the extracted strings. Report syntax errors.
+3.  **Final Verification:** Run `scripts/ingest.py` to ensure the vector DB is populated, then run `npm build` in `/web` to verify the static site generation succeeds."
+
+---
