@@ -24,10 +24,9 @@ class TextbookIngestion:
     """Handles ingestion of textbook content into Qdrant"""
 
     def __init__(self):
-        # Initialize OpenAI client for Gemini embeddings
+        # Initialize OpenAI client for embeddings
         self.openai_client = OpenAI(
-            base_url=os.getenv("OPENAI_API_BASE"),
-            api_key=os.getenv("GEMINI_API_KEY")
+            api_key=os.getenv("OPENAI_API_KEY")
         )
 
         # Initialize Qdrant client
@@ -37,7 +36,7 @@ class TextbookIngestion:
         )
 
         self.collection_name = "robotics_textbook"
-        self.embedding_model = "text-embedding-004"
+        self.embedding_model = "text-embedding-3-small"
 
     def create_collection(self):
         """Create Qdrant collection if it doesn't exist"""
@@ -48,10 +47,10 @@ class TextbookIngestion:
                 print(f"✓ Collection '{self.collection_name}' already exists")
                 return
 
-            # Create collection with 768 dimensions (text-embedding-004)
+            # Create collection with 1536 dimensions (text-embedding-3-small)
             self.qdrant_client.create_collection(
                 collection_name=self.collection_name,
-                vectors_config=VectorParams(size=768, distance=Distance.COSINE)
+                vectors_config=VectorParams(size=1536, distance=Distance.COSINE)
             )
             print(f"✓ Created collection '{self.collection_name}'")
 
@@ -113,7 +112,7 @@ class TextbookIngestion:
 
     def generate_embedding(self, text: str) -> List[float]:
         """
-        Generate embedding for text using Gemini via OpenAI compatibility
+        Generate embedding for text using OpenAI text-embedding-3-small
 
         Args:
             text: Text to embed

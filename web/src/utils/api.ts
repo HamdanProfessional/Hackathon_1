@@ -294,8 +294,8 @@ class ApiClient {
   /**
    * Convenience method for personalize API
    */
-  async personalize(content: string, hardwareBg: string): Promise<ApiResponse<any>> {
-    return this.postApi('/personalize', { content, hardware_bg: hardwareBg });
+  async personalize(content: string, hardwareBg: string, skillLevel: string = 'Beginner'): Promise<ApiResponse<any>> {
+    return this.postApi('/personalize', { content, hardware_bg: hardwareBg, skill_level: skillLevel });
   }
 
   /**

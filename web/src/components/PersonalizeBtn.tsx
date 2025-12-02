@@ -15,6 +15,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
 import { apiClient } from '../utils/api';
+import { useSession } from '../lib/auth-client';
 import styles from './PersonalizeBtn.module.css';
 
 interface PersonalizeBtnProps {
@@ -27,7 +28,9 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
   const [error, setError] = useState<string | null>(null);
   const [originalContent, setOriginalContent] = useState<string>('');
   const [hardwareBg, setHardwareBg] = useState<string>('');
+  const [skillLevel, setSkillLevel] = useState<string>('Beginner');
   const location = useLocation();
+  const { data: session } = useSession();
 
   // Reset personalization state when navigating to a different chapter
   useEffect(() => {
@@ -36,11 +39,22 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
     setOriginalContent('');
   }, [location.pathname]);
 
-  // Get user hardware background from localStorage or context
+  // Get user hardware background and skill level from session or fallback to localStorage
   useEffect(() => {
-    const bg = localStorage.getItem('user_hardware_bg') || 'Unknown';
-    setHardwareBg(bg);
-  }, []);
+    if (session?.user?.hardwareBg) {
+      setHardwareBg(session.user.hardwareBg);
+    } else {
+      const bg = localStorage.getItem('user_hardware_bg') || 'Laptop CPU';
+      setHardwareBg(bg);
+    }
+
+    if (session?.user?.skillLevel) {
+      setSkillLevel(session.user.skillLevel);
+    } else {
+      const level = localStorage.getItem('user_skill_level') || 'Beginner';
+      setSkillLevel(level);
+    }
+  }, [session]);
 
   /**
    * Extract markdown content from the main article element
@@ -191,8 +205,8 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
     setError(null);
 
     try {
-      // Request personalized content from API
-      const response = await apiClient.personalize(content, hardwareBg);
+      // Request personalized content from API with skill level
+      const response = await apiClient.personalize(content, hardwareBg, skillLevel);
 
       if (!response.data || response.status !== 200) {
         throw new Error(response.error || 'Failed to personalize content');
@@ -226,7 +240,7 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
         className={`${styles.personalizeBtn} ${isPersonalized ? styles.active : ''}`}
         onClick={handlePersonalize}
         disabled={isLoading}
-        title={isPersonalized ? 'Show original content' : `Personalize for ${hardwareBg}`}
+        title={isPersonalized ? 'Show original content' : `Personalize for ${hardwareBg} (${skillLevel})`}
       >
         {isLoading ? (
           <span className={styles.loading}>
@@ -238,7 +252,7 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
           </span>
         ) : (
           <span>
-            <span className={styles.icon}>🔧</span> Personalize for {hardwareBg}
+            <span className={styles.icon}>🔧</span> Personalize ({skillLevel})
           </span>
         )}
       </button>

@@ -7,7 +7,7 @@
 
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { postgres } from '@neondatabase/serverless';
+import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
 import { sql } from 'drizzle-orm';
 
@@ -20,8 +20,8 @@ async function initializeDatabase() {
   }
 
   console.log('🔄 Initializing database connection...');
-  const client = postgres(process.env.DATABASE_URL);
-  const db = drizzle(client, { schema });
+  const client = neon(process.env.DATABASE_URL);
+  const db = drizzle(client as any, { schema });
 
   try {
     console.log('📝 Checking database schema...');

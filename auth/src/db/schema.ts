@@ -30,6 +30,7 @@ export const users = pgTable('user', {
   // Custom fields for robotics platform
   hardware_bg: varchar('hardware_bg', { length: 20 }).notNull().default('Laptop'),
   software_bg: text('software_bg').default(''),
+  skill_level: varchar('skill_level', { length: 20 }).notNull().default('Beginner'),
 
   // Metadata
   image: text('image'),
@@ -110,4 +111,18 @@ export type HardwareBg = (typeof HARDWARE_BG_OPTIONS)[number];
  */
 export function isValidHardwareBg(value: string): value is HardwareBg {
   return HARDWARE_BG_OPTIONS.includes(value as HardwareBg);
+}
+
+/**
+ * Skill level validation
+ * Valid values: Beginner, Advanced
+ */
+export const SKILL_LEVEL_OPTIONS = ['Beginner', 'Advanced'] as const;
+export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number];
+
+/**
+ * Validate skill level value
+ */
+export function isValidSkillLevel(value: string): value is SkillLevel {
+  return SKILL_LEVEL_OPTIONS.includes(value as SkillLevel);
 }

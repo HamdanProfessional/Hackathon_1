@@ -12,10 +12,15 @@ import asyncio
 # Load settings
 from core.config import settings
 
-# Initialize AsyncOpenAI client with Gemini configuration
+# Initialize AsyncOpenAI client with Gemini configuration (for LLM)
 openai_client = AsyncOpenAI(
     base_url=settings.OPENAI_API_BASE,
     api_key=settings.GEMINI_API_KEY
+)
+
+# Initialize separate OpenAI client for embeddings
+embedding_client = AsyncOpenAI(
+    api_key=settings.OPENAI_API_KEY
 )
 
 # Initialize Qdrant client
@@ -37,9 +42,9 @@ def search_textbook(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         List of relevant textbook chunks with metadata
     """
     try:
-        # Generate embedding for the query
-        embedding_response = openai_client.embeddings.create(
-            model="text-embedding-004",
+        # Generate embedding for the query using OpenAI
+        embedding_response = embedding_client.embeddings.create(
+            model="text-embedding-3-small",
             input=query
         )
         query_vector = embedding_response.data[0].embedding

@@ -1,7 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(mkdir:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(test:*)",
+      "Bash(npm run build:*)",
+      "Bash(bash:*)",
+      "Bash(npm install:*)",
+      "SlashCommand(/sp.phr)",
+      "Bash(.specify/scripts/bash/create-phr.sh:*)",
+      "Bash(git config:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(npx @better-auth/cli generate)",
+      "Bash(npx @better-auth/cli:*)",
+      "Bash(npx tsc:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)",
+      "Bash(node test-env.js:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

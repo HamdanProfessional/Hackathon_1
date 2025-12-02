@@ -14,6 +14,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useChatContext } from '../context/ChatContext';
 import styles from './ChatWidget.module.css';
 
 interface Message {
@@ -40,7 +41,7 @@ interface ChatResponse {
 }
 
 export const ChatWidget: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isChatOpen, setIsChatOpen, activeContexts, removeContext, clearContexts } = useChatContext();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -59,10 +60,10 @@ export const ChatWidget: React.FC = () => {
 
   // Focus input when widget opens
   useEffect(() => {
-    if (isOpen) {
+    if (isChatOpen) {
       inputRef.current?.focus();
     }
-  }, [isOpen]);
+  }, [isChatOpen]);
 
   /**
    * Extract selected text from the page for context-aware questions
@@ -99,11 +100,14 @@ export const ChatWidget: React.FC = () => {
     setError(null);
 
     try {
-      // Prepare request with conversation history and selection context
-      const selectionContext = getSelectionContext();
-      const messageContent = selectionContext
-        ? `${input}\n\n[Selected text context: "${selectionContext}"]`
-        : input;
+      // Prepare request with conversation history and active contexts
+      let messageContent = input;
+
+      // Add active contexts if present
+      if (activeContexts.length > 0) {
+        const contextsText = activeContexts.join('\n\n---\n\n');
+        messageContent = `${input}\n\n[Context from page:\n${contextsText}]`;
+      }
 
       // Convert history to format expected by API
       const history = messages.map((msg) => ({
@@ -111,7 +115,7 @@ export const ChatWidget: React.FC = () => {
         content: msg.content,
       }));
 
-      const response = await fetch('/api/chat', {
+      const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,6 +123,7 @@ export const ChatWidget: React.FC = () => {
         body: JSON.stringify({
           message: messageContent,
           history,
+          context: activeContexts.join('\n'), // Include contexts in payload
         }),
       });
 
@@ -169,22 +174,22 @@ export const ChatWidget: React.FC = () => {
       {/* Floating toggle button */}
       <button
         className={styles.toggleButton}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsChatOpen(!isChatOpen)}
         title="Open chat assistant"
         aria-label="Chat assistant"
       >
-        {isOpen ? '✕' : '💬'}
+        {isChatOpen ? '✕' : '💬'}
       </button>
 
       {/* Chat widget window */}
-      {isOpen && (
+      {isChatOpen && (
         <div className={styles.chatWindow}>
           {/* Header */}
           <div className={styles.header}>
             <h3 className={styles.title}>Textbook Assistant</h3>
             <button
               className={styles.closeButton}
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsChatOpen(false)}
               aria-label="Close chat"
             >
               ✕
@@ -246,6 +251,40 @@ export const ChatWidget: React.FC = () => {
 
           {/* Input area */}
           <div className={styles.inputArea}>
+            {/* Context Chips */}
+            {activeContexts.length > 0 && (
+              <div className={styles.contextChipsContainer}>
+                <div className={styles.contextChipsHeader}>
+                  <span className={styles.contextLabel}>📎 Context:</span>
+                  <button
+                    onClick={clearContexts}
+                    className={styles.clearContextsButton}
+                    title="Clear all contexts"
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <div className={styles.contextChips}>
+                  {activeContexts.map((context, index) => (
+                    <div key={index} className={styles.contextChip}>
+                      <span className={styles.chipText}>
+                        {context.substring(0, 50)}
+                        {context.length > 50 ? '...' : ''}
+                      </span>
+                      <button
+                        onClick={() => removeContext(index)}
+                        className={styles.chipRemove}
+                        title="Remove this context"
+                        aria-label="Remove context"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSendMessage} className={styles.form}>
               <input
                 ref={inputRef}

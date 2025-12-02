@@ -1,3 +1,10 @@
+import { config } from 'dotenv';
+import { resolve } from 'path';
+
+// Load .env from parent directory (repository root)
+// override: true forces .env to override system environment variables
+config({ path: resolve(__dirname, '../../.env'), override: true });
+
 /**
  * Authentication Server
  *
@@ -5,7 +12,10 @@
  * Provides endpoints for signup, login, and session management
  */
 
-import 'dotenv/config';
+// Debug: Check if DATABASE_URL is loaded
+console.log("🔍 Checking DB URL:", process.env.DATABASE_URL ? "Loaded ✅" : "Missing ❌");
+console.log("🔍 DB URL value:", process.env.DATABASE_URL?.substring(0, 30) + "...");
+
 import { auth } from './auth.config';
 import http from 'http';
 import url from 'url';
@@ -18,8 +28,15 @@ const HOST = process.env.AUTH_HOST || 'localhost';
  * Request handler for auth routes
  */
 async function requestHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Enable CORS with explicit origins (required for credentials)
+  const allowedOrigins = ['http://localhost:3000', 'http://localhost:8000'];
+  const origin = req.headers.origin || '';
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -60,10 +77,23 @@ async function requestHandler(req: http.IncomingMessage, res: http.ServerRespons
     }
 
     // Route to better-auth handler
-    // Note: better-auth has built-in HTTP handler support
+    // Note: better-auth returns a Web API Response
     if (pathname.startsWith('/api/auth')) {
-      const betterAuthHandler = await auth.handler(req, res);
-      if (betterAuthHandler) {
+      // Convert Node.js IncomingMessage to Web API Request
+      const request = new Request(`http://${req.headers.host}${req.url}`, {
+        method: req.method,
+        headers: req.headers as any,
+      });
+
+      const response = await auth.handler(request);
+      if (response) {
+        // Convert Web API Response to Node.js response
+        const headers: any = {};
+        response.headers.forEach((value, key) => {
+          headers[key] = value;
+        });
+        res.writeHead(response.status, headers);
+        res.end(await response.text());
         return;
       }
     }

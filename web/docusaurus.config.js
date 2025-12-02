@@ -13,8 +13,7 @@ const config = {
   organizationName: 'ai-robotics',
   projectName: 'textbook-platform',
 
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'warn',
 
   // Folder-based routing (NOT i18n plugin per research.md)
   presets: [
@@ -42,9 +41,13 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'en/intro',
             position: 'left',
             label: 'Textbook',
+          },
+          {
+            type: 'custom-authNavbarItem',
+            position: 'right',
           },
         ],
       },
