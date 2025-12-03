@@ -7,9 +7,9 @@ const config = {
   tagline: 'Hardware-Adaptive Learning Platform',
   favicon: 'img/favicon.ico',
 
-  // Vercel deployment configuration
-  url: 'https://web-chwgs5l23-hamdanprofessionals-projects.vercel.app',
-  baseUrl: '/',
+  // GitHub Pages deployment configuration
+  url: 'https://HamdanProfessional.github.io',
+  baseUrl: '/Hackathon_1/',
 
   organizationName: 'HamdanProfessional', // GitHub username
   projectName: 'Hackathon_1', // Repository name
@@ -18,7 +18,7 @@ const config = {
 
   onBrokenLinks: 'warn',
 
-  // Custom fields for backend API URLs
+  // Custom fields for backend API URLs (Vercel serverless functions)
   customFields: {
     apiUrl: process.env.API_URL || 'https://api-257cf7htk-hamdanprofessionals-projects.vercel.app',
     authUrl: process.env.AUTH_URL || 'https://auth-8gydz6z5y-hamdanprofessionals-projects.vercel.app',
