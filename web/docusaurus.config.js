@@ -7,11 +7,15 @@ const config = {
   tagline: 'Hardware-Adaptive Learning Platform',
   favicon: 'img/favicon.ico',
 
-  url: 'https://your-site.vercel.app',
-  baseUrl: '/',
+  // GitHub Pages deployment configuration
+  // IMPORTANT: Replace <YOUR_GITHUB_USERNAME> and <REPO_NAME> with your actual values
+  url: 'https://<YOUR_GITHUB_USERNAME>.github.io',
+  baseUrl: '/<REPO_NAME>/',
 
-  organizationName: 'ai-robotics',
-  projectName: 'textbook-platform',
+  organizationName: '<YOUR_GITHUB_USERNAME>', // Usually your GitHub org/user name
+  projectName: '<REPO_NAME>', // Usually your repo name
+  deploymentBranch: 'gh-pages',
+  trailingSlash: false,
 
   onBrokenLinks: 'warn',
 
