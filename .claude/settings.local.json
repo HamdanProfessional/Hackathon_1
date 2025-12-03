@@ -28,7 +28,8 @@
       "Bash(npx drizzle-kit:*)",
       "Bash(npm run db:push:*)",
       "Bash(node run-migration.js:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
