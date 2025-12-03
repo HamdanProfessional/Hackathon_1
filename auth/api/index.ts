@@ -1,12 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { config } from 'dotenv';
-import { resolve } from 'path';
-
-// Load environment variables
-config({ path: resolve(__dirname, '../../.env'), override: false });
-
-// Import auth configuration
-import { auth } from '../src/auth.config';
 
 /**
  * Vercel Serverless Function for Authentication
@@ -15,17 +7,12 @@ import { auth } from '../src/auth.config';
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:8000',
-    process.env.FRONTEND_URL,
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
-  ].filter(Boolean);
-
   const origin = req.headers.origin || '';
 
-  if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+  if (origin.includes('localhost') || origin.endsWith('.vercel.app')) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
   }
 
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -42,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const pathname = req.url || '';
 
     // Health check endpoint
-    if (pathname === '/api/auth/health' && req.method === 'GET') {
+    if (pathname === '/api/auth/health' || pathname === '/health') {
       res.status(200).json({
         status: 'healthy',
         service: 'auth',
@@ -61,8 +48,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Route to better-auth handler
+    // Route to better-auth handler (lazy load)
     if (pathname.startsWith('/api/auth')) {
+      // Lazy load auth config only when needed
+      const { auth } = await import('../src/auth.config');
+
       // Get request body
       const body = req.method === 'POST' || req.method === 'PUT'
         ? JSON.stringify(req.body)

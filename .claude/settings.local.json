@@ -33,7 +33,15 @@
       "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
       "Bash(git checkout:*)",
       "Bash(vercel --version:*)",
-      "Bash(vercel --prod --yes)"
+      "Bash(vercel --prod --yes)",
+      "Bash(git push:*)",
+      "Bash(vercel env add:*)",
+      "Bash(echo:*)",
+      "Bash(vercel env:*)",
+      "Bash(vercel logs:*)",
+      "Bash(printf:*)",
+      "Bash(openssl rand:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
