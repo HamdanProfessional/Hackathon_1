@@ -20,8 +20,8 @@ const config = {
 
   // Custom fields for backend API URLs
   customFields: {
-    apiUrl: process.env.API_URL || 'https://api-6c3ak103z-hamdanprofessionals-projects.vercel.app',
-    authUrl: process.env.AUTH_URL || 'https://auth-1d067e7vm-hamdanprofessionals-projects.vercel.app',
+    apiUrl: process.env.API_URL || 'https://api-89prj7jx3-hamdanprofessionals-projects.vercel.app',
+    authUrl: process.env.AUTH_URL || 'https://auth-6elpmt7vk-hamdanprofessionals-projects.vercel.app',
   },
 
   // Folder-based routing (NOT i18n plugin per research.md)
