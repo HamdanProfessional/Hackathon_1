@@ -639,3 +639,64 @@ Expected Output: You should see '🔍 Checking DB URL: Loaded ✅' in the consol
 ### 4. Register Component (`web/src/theme/NavbarItem/ComponentTypes.tsx`)
 *   **Action:** Register `custom-search` mapping to `SearchNavbarItem`.
 *   **Config:** Update `docusaurus.config.ts` to add this item to the Navbar (position: left or right)."
+
+---
+
+/sp.implement "Setup GitHub Repository & Deploy Frontend to GitHub Pages
+
+**Goal:** Initialize version control, configure Docusaurus for GitHub Pages, and provide a deployment script.
+
+### 1. Update Docusaurus Config (`web/docusaurus.config.ts`)
+*   **Action:** Update the deployment fields.
+*   **Code:**
+    ```typescript
+    // ... inside config object
+    url: 'https://<YOUR_GITHUB_USERNAME>.github.io', // Your website URL
+    baseUrl: '/<REPO_NAME>/', // Base URL for your project
+    organizationName: '<YOUR_GITHUB_USERNAME>', // Usually your GitHub org/user name
+    projectName: '<REPO_NAME>', // Usually your repo name
+    deploymentBranch: 'gh-pages',
+    trailingSlash: false,
+    // ...
+    ```
+
+### 2. Create Deployment Script (`deploy_gh_pages.sh`)
+*   **Action:** Create a shell script in the root to automate the process.
+*   **Content:**
+    ```bash
+    #!/bin/bash
+    
+    # 1. Initialize Git if not done
+    if [ ! -d ".git" ]; then
+        echo "Initializing Git..."
+        git init
+        # Create .gitignore ignoring venv, node_modules, .env, __pycache__
+        echo "venv/\nnode_modules/\n.env\n__pycache__/\ndist/\n.DS_Store" > .gitignore
+    fi
+
+    # 2. Commit Code
+    git add .
+    git commit -m "Initial commit: Physical AI Platform"
+
+    # 3. Create Repo (Requires GitHub CLI 'gh' installed)
+    # If 'gh' is missing, user must create repo manually and run: git remote add origin <url>
+    if command -v gh &> /dev/null; then
+        echo "Creating GitHub Repo..."
+        gh repo create physical-ai-textbook --public --source=. --remote=origin --push
+    else
+        echo "⚠️ GitHub CLI (gh) not found. Please create the repo manually and add remote origin."
+    fi
+
+    # 4. Deploy Docusaurus
+    echo "Deploying to GitHub Pages..."
+    cd web
+    # The user needs to set these vars or hardcode them in config
+    GIT_USER=$(git config user.name) npm run deploy
+    ```
+
+### 3. Instructions
+*   **Output:** Tell the user to:
+    1.  Edit `web/docusaurus.config.ts` with their actual Username and Repo Name.
+    2.  Run `bash deploy_gh_pages.sh`."
+
+---

@@ -3,6 +3,10 @@
 # Development startup script for Physical AI & Robotics Platform
 # This script sets up and starts all three services in parallel
 
+# Get the directory where the script is located and navigate to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/.."
+
 echo "========================================"
 echo "Physical AI & Robotics Platform"
 echo "Development Environment Setup"

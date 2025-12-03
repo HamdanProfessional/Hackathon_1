@@ -2,29 +2,37 @@
 
 This directory contains automated scripts to simplify running the Physical AI & Robotics Platform.
 
+All scripts are located in the `scripts/` folder.
+
 ## Quick Start
 
 ### Windows
 
 ```bash
 # Start all services (API, Auth, Web)
-start-dev.bat
+scripts\start-dev.bat
 
 # Build for production
-build.bat
+scripts\build.bat
+
+# Deploy to GitHub Pages
+scripts\deploy_gh_pages.bat
 ```
 
 ### Linux/macOS
 
 ```bash
 # Make scripts executable (first time only)
-chmod +x start-dev.sh stop-dev.sh
+chmod +x scripts/*.sh
 
 # Start all services
-./start-dev.sh
+scripts/start-dev.sh
 
 # Stop all services
-./stop-dev.sh
+scripts/stop-dev.sh
+
+# Deploy to GitHub Pages
+scripts/deploy_gh_pages.sh
 ```
 
 ## Scripts Overview

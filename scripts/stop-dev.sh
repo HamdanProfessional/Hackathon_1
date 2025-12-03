@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Stop all development services
+n# Get the directory where the script is located and navigate to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/.."
 
 echo "========================================"
 echo "Stopping all services..."

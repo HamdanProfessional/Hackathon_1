@@ -8,12 +8,12 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // GitHub Pages deployment configuration
-  // IMPORTANT: Replace <YOUR_GITHUB_USERNAME> and <REPO_NAME> with your actual values
-  url: 'https://<YOUR_GITHUB_USERNAME>.github.io',
+  // IMPORTANT: Replace <REPO_NAME> with your actual repository name
+  url: 'https://HamdanProfessional.github.io',
   baseUrl: '/<REPO_NAME>/',
 
-  organizationName: '<YOUR_GITHUB_USERNAME>', // Usually your GitHub org/user name
-  projectName: '<REPO_NAME>', // Usually your repo name
+  organizationName: 'HamdanProfessional', // GitHub username
+  projectName: '<REPO_NAME>', // Replace with your repo name
   deploymentBranch: 'gh-pages',
   trailingSlash: false,
 

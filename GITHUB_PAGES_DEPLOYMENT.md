@@ -21,21 +21,21 @@ This guide explains how to deploy the Physical AI & Robotics Platform frontend t
 
 ### Step 1: Update Docusaurus Configuration
 
-Edit `web/docusaurus.config.js` and replace the placeholders:
+Edit `web/docusaurus.config.js` and replace `<REPO_NAME>` with your repository name:
 
 ```javascript
-// Replace these values with your actual GitHub username and repo name
-url: 'https://YOUR_GITHUB_USERNAME.github.io',
-baseUrl: '/REPO_NAME/',
-organizationName: 'YOUR_GITHUB_USERNAME',
-projectName: 'REPO_NAME',
+// Current configuration:
+url: 'https://HamdanProfessional.github.io',  // ✓ Already set
+baseUrl: '/<REPO_NAME>/',  // ← Replace with your repo name
+organizationName: 'HamdanProfessional',  // ✓ Already set
+projectName: '<REPO_NAME>',  // ← Replace with your repo name
 ```
 
-**Example:**
+**Example (if your repo is named "robotics-platform"):**
 ```javascript
-url: 'https://johndoe.github.io',
+url: 'https://HamdanProfessional.github.io',
 baseUrl: '/robotics-platform/',
-organizationName: 'johndoe',
+organizationName: 'HamdanProfessional',
 projectName: 'robotics-platform',
 ```
 
@@ -43,13 +43,13 @@ projectName: 'robotics-platform',
 
 **Windows:**
 ```bash
-deploy_gh_pages.bat
+scripts\deploy_gh_pages.bat
 ```
 
 **Linux/macOS:**
 ```bash
-chmod +x deploy_gh_pages.sh
-./deploy_gh_pages.sh
+chmod +x scripts/deploy_gh_pages.sh
+scripts/deploy_gh_pages.sh
 ```
 
 The script will:

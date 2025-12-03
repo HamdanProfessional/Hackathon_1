@@ -2,6 +2,9 @@
 REM Development startup script for Physical AI & Robotics Platform
 REM This script sets up and starts all three services in parallel
 
+REM Get the directory where the script is located and navigate to project root
+cd /d "%~dp0.."
+
 echo ========================================
 echo Physical AI & Robotics Platform
 echo Development Environment Setup

@@ -1,6 +1,8 @@
 @echo off
 REM ========================================
 REM GitHub Pages Deployment Script (Windows)
+nREM Get the directory where the script is located and navigate to project root
+cd /d "%~dp0.."
 REM Physical AI & Robotics Platform
 REM ========================================
 
