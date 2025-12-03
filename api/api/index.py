@@ -40,27 +40,51 @@ async def root():
         "docs": "/api/docs"
     }
 
-# Chat endpoint - lazy load heavy dependencies
+# Chat endpoint - simplified for serverless (no RAG for now)
 @app.post("/chat")
 async def chat(request: dict):
-    # Only import when actually needed
     try:
-        from src.router import route_request
+        from openai import AsyncOpenAI
 
-        result = await route_request(
-            query=request.get("message", ""),
-            history=request.get("history", [])
+        client = AsyncOpenAI(
+            api_key=os.getenv("GEMINI_API_KEY"),
+            base_url=os.getenv("OPENAI_API_BASE")
+        )
+
+        message = request.get("message", "")
+        history = request.get("history", [])
+
+        # Build conversation messages
+        messages = [
+            {"role": "system", "content": "You are a helpful tutor for Physical AI and Robotics. Answer questions about ROS2, Isaac Sim, Gazebo, and humanoid robotics."}
+        ]
+
+        # Add history
+        for msg in history[-5:]:  # Last 5 messages for context
+            messages.append(msg)
+
+        # Add current message
+        messages.append({"role": "user", "content": message})
+
+        # Call LLM
+        response = await client.chat.completions.create(
+            model="gemini-2.0-flash-exp",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1000
         )
 
         return {
-            "response": result["response"],
-            "sources": result.get("sources", []),
-            "agent_type": result.get("agent_type"),
-            "intent": result.get("intent")
+            "response": response.choices[0].message.content,
+            "sources": [],
+            "agent_type": "Tutor",
+            "intent": "GENERAL"
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return {
-            "response": f"Error: {str(e)}",
+            "response": f"I apologize, but I'm having trouble connecting right now. Error: {str(e)}",
             "sources": [],
             "agent_type": "error",
             "intent": "ERROR"

@@ -20,7 +20,7 @@ const config = {
 
   // Custom fields for backend API URLs
   customFields: {
-    apiUrl: process.env.API_URL || 'https://api-d01k197vq-hamdanprofessionals-projects.vercel.app',
+    apiUrl: process.env.API_URL || 'https://api-257cf7htk-hamdanprofessionals-projects.vercel.app',
     authUrl: process.env.AUTH_URL || 'https://auth-8gydz6z5y-hamdanprofessionals-projects.vercel.app',
   },
 
