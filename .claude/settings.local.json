@@ -30,7 +30,8 @@
       "Bash(node run-migration.js:*)",
       "Bash(git mv:*)",
       "Bash(git add:*)",
-      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)"
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
