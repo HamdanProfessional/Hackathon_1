@@ -7,9 +7,9 @@ const config = {
   tagline: 'Hardware-Adaptive Learning Platform',
   favicon: 'img/favicon.ico',
 
-  // GitHub Pages deployment configuration
-  url: 'https://HamdanProfessional.github.io',
-  baseUrl: '/Hackathon_1/',
+  // Vercel deployment configuration
+  url: 'https://web-chwgs5l23-hamdanprofessionals-projects.vercel.app',
+  baseUrl: '/',
 
   organizationName: 'HamdanProfessional', // GitHub username
   projectName: 'Hackathon_1', // Repository name
