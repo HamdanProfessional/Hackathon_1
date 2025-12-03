@@ -15,6 +15,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useChatContext } from '../context/ChatContext';
+import { apiClient } from '@site/src/utils/api';
 import styles from './ChatWidget.module.css';
 
 interface Message {
@@ -115,23 +116,14 @@ export const ChatWidget: React.FC = () => {
         content: msg.content,
       }));
 
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: messageContent,
-          history,
-          context: activeContexts.join('\n'), // Include contexts in payload
-        }),
-      });
+      // Use API client to make the request
+      const result = await apiClient.chat(messageContent, history);
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      const data: ChatResponse = await response.json();
+      const data: ChatResponse = result.data;
 
       // Add assistant response to messages
       const assistantMessage: Message = {
