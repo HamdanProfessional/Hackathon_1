@@ -8,12 +8,11 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // GitHub Pages deployment configuration
-  // IMPORTANT: Replace <REPO_NAME> with your actual repository name
   url: 'https://HamdanProfessional.github.io',
-  baseUrl: '/<REPO_NAME>/',
+  baseUrl: '/Hackathon_1/',
 
   organizationName: 'HamdanProfessional', // GitHub username
-  projectName: '<REPO_NAME>', // Replace with your repo name
+  projectName: 'Hackathon_1', // Repository name
   deploymentBranch: 'gh-pages',
   trailingSlash: false,
 
