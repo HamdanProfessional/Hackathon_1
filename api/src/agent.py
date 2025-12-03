@@ -10,7 +10,7 @@ from typing import Optional, List, Dict, Any
 import asyncio
 
 # Load settings
-from core.config import settings
+from src.core.config import settings
 
 # Initialize AsyncOpenAI client with Gemini configuration (for LLM)
 openai_client = AsyncOpenAI(

@@ -18,7 +18,7 @@ import { sql } from 'drizzle-orm';
  * - hardware_bg: Hardware background (RTX4090, Jetson, Laptop, Cloud)
  * - software_bg: Software background (free text description)
  */
-export const users = pgTable('user', {
+export const user = pgTable('user', {
   // Standard better-auth fields
   id: text('id').primaryKey(),
   name: text('name'),
@@ -42,7 +42,7 @@ export const users = pgTable('user', {
  * Sessions table (managed by better-auth)
  * Stores active user sessions
  */
-export const sessions = pgTable('session', {
+export const session = pgTable('session', {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expiresAt').notNull(),
   token: text('token').unique().notNull(),
@@ -52,18 +52,18 @@ export const sessions = pgTable('session', {
   userAgent: text('userAgent'),
   userId: text('userId')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
 });
 
 /**
  * Accounts table (managed by better-auth)
  * For OAuth and external authentication providers
  */
-export const accounts = pgTable('account', {
+export const account = pgTable('account', {
   id: text('id').primaryKey(),
   userId: text('userId')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
   accountId: text('accountId').notNull(),
   providerId: text('providerId').notNull(),
   accessToken: text('accessToken'),
@@ -81,7 +81,7 @@ export const accounts = pgTable('account', {
  * Verification tokens table (managed by better-auth)
  * For email verification, password reset, etc.
  */
-export const verifications = pgTable('verification', {
+export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
@@ -93,11 +93,11 @@ export const verifications = pgTable('verification', {
 /**
  * Type exports for TypeScript
  */
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
-export type Session = typeof sessions.$inferSelect;
-export type Account = typeof accounts.$inferSelect;
-export type Verification = typeof verifications.$inferSelect;
+export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
+export type Session = typeof session.$inferSelect;
+export type Account = typeof account.$inferSelect;
+export type Verification = typeof verification.$inferSelect;
 
 /**
  * Hardware background validation

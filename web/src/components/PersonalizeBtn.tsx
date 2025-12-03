@@ -41,17 +41,37 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
 
   // Get user hardware background and skill level from session or fallback to localStorage
   useEffect(() => {
-    if (session?.user?.hardwareBg) {
-      setHardwareBg(session.user.hardwareBg);
+    console.log('🔍 PersonalizeBtn - Session data:', {
+      session,
+      user: session?.user,
+      // @ts-ignore
+      hardware_bg: session?.user?.hardware_bg,
+      // @ts-ignore
+      skill_level: session?.user?.skill_level,
+    });
+
+    // Better-Auth stores custom fields with snake_case
+    // @ts-ignore - Better-Auth custom fields
+    if (session?.user?.hardware_bg) {
+      // @ts-ignore
+      const hw = session.user.hardware_bg;
+      console.log('✅ Setting hardware from session:', hw);
+      setHardwareBg(hw);
     } else {
       const bg = localStorage.getItem('user_hardware_bg') || 'Laptop CPU';
+      console.log('⚠️ No hardware in session, using fallback:', bg);
       setHardwareBg(bg);
     }
 
-    if (session?.user?.skillLevel) {
-      setSkillLevel(session.user.skillLevel);
+    // @ts-ignore - Better-Auth custom fields
+    if (session?.user?.skill_level) {
+      // @ts-ignore
+      const skill = session.user.skill_level;
+      console.log('✅ Setting skill level from session:', skill);
+      setSkillLevel(skill);
     } else {
       const level = localStorage.getItem('user_skill_level') || 'Beginner';
+      console.log('⚠️ No skill level in session, using fallback:', level);
       setSkillLevel(level);
     }
   }, [session]);
@@ -124,21 +144,39 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
       // Create a container for the new content
       const tempDiv = document.createElement('div');
       tempDiv.className = styles.personalizedContent;
-      tempDiv.innerHTML = `<div class="${styles.contentWrapper}">${escapeHtml(newContent)}</div>`;
+      tempDiv.setAttribute('data-personalized', 'true');
 
-      // Replace content (but preserve the first heading)
-      const heading = contentElement.querySelector('h1, h2');
-      if (heading) {
-        heading.parentNode?.insertBefore(tempDiv, heading.nextSibling);
-        // Hide original content
-        const originalText = contentElement.querySelectorAll('p, li, code');
-        originalText.forEach((el) => {
-          if (el !== heading) {
-            (el as HTMLElement).style.display = 'none';
-          }
-        });
+      // Convert markdown-like formatting to HTML
+      const htmlContent = convertMarkdownToHTML(newContent);
+      tempDiv.innerHTML = `<div class="${styles.contentWrapper}">${htmlContent}</div>`;
+
+      // Find the main content area wrapper more precisely
+      // Look for the actual article content container
+      const mainContentDiv = contentElement.querySelector('.theme-doc-markdown') ||
+                              contentElement.querySelector('article > div') ||
+                              contentElement;
+
+      // Find the heading
+      const heading = mainContentDiv.querySelector('h1, h2');
+
+      // More precise selection: only hide direct content children, not structural elements
+      // Avoid hiding navigation, TOC, or other layout components
+      const elementsToHide = mainContentDiv.querySelectorAll(':scope > p, :scope > ul, :scope > ol, :scope > pre, :scope > blockquote, :scope > h3, :scope > h4, :scope > h5, :scope > h6, :scope > div:not([class*="theme-"]):not([class*="docusaurus"]):not([data-personalized])');
+
+      elementsToHide.forEach((el) => {
+        // Get the computed display value before hiding
+        const computedStyle = window.getComputedStyle(el as HTMLElement);
+        const originalDisplay = computedStyle.display;
+
+        (el as HTMLElement).setAttribute('data-original-display', originalDisplay);
+        (el as HTMLElement).style.display = 'none';
+      });
+
+      // Insert personalized content after heading or at the start
+      if (heading && heading.parentNode) {
+        heading.parentNode.insertBefore(tempDiv, heading.nextSibling);
       } else {
-        contentElement.innerHTML = tempDiv.innerHTML;
+        mainContentDiv.insertBefore(tempDiv, mainContentDiv.firstChild);
       }
     } catch (err) {
       console.error('Error updating DOM with personalized content:', err);
@@ -166,15 +204,17 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
       if (!contentElement) return;
 
       // Remove personalized content wrapper
-      const personalizedWrapper = contentElement.querySelector(`.${styles.personalizedContent}`);
+      const personalizedWrapper = contentElement.querySelector('[data-personalized="true"]');
       if (personalizedWrapper) {
         personalizedWrapper.remove();
       }
 
-      // Show hidden original content
-      const hiddenElements = contentElement.querySelectorAll('[style*="display: none"]');
+      // Show hidden original content - search more broadly in case elements moved
+      const hiddenElements = document.querySelectorAll('[data-original-display]');
       hiddenElements.forEach((el) => {
-        (el as HTMLElement).style.display = '';
+        const originalDisplay = (el as HTMLElement).getAttribute('data-original-display') || 'block';
+        (el as HTMLElement).style.display = originalDisplay === 'none' ? 'block' : originalDisplay;
+        (el as HTMLElement).removeAttribute('data-original-display');
       });
     } catch (err) {
       console.error('Error restoring original content:', err);
@@ -212,8 +252,20 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
         throw new Error(response.error || 'Failed to personalize content');
       }
 
-      // Replace content in DOM
+      // Get personalized content
       const personalizedContent = response.data.personalized_content || response.data.response;
+
+      // Validate we got actual content back
+      if (!personalizedContent || personalizedContent.trim().length === 0) {
+        throw new Error('Received empty response from server');
+      }
+
+      // Check if the response is an error message
+      if (personalizedContent.startsWith('Unable to personalize')) {
+        throw new Error(personalizedContent.replace('Unable to personalize content: ', ''));
+      }
+
+      // Only replace content in DOM if we successfully got valid content
       replaceContentInDOM(personalizedContent);
 
       setIsPersonalized(true);
@@ -224,10 +276,18 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
       const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(`Personalization failed: ${errorMsg}`);
       console.error('Personalization error:', err);
+
+      // IMPORTANT: Don't leave content hidden if there was an error
+      // Content is still in original state, so just clear the loading state
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Don't render if user is not logged in
+  if (!session?.user) {
+    return null;
+  }
 
   // Don't render if no hardware background is set
   if (!hardwareBg || hardwareBg === 'Unknown') {
@@ -252,7 +312,7 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
           </span>
         ) : (
           <span>
-            <span className={styles.icon}>🔧</span> Personalize ({skillLevel})
+            <span className={styles.icon}>🔧</span> Personalize for Me
           </span>
         )}
       </button>
@@ -275,17 +335,71 @@ export const PersonalizeBtn: React.FC<PersonalizeBtnProps> = ({ onPersonalize })
 };
 
 /**
- * Simple HTML escape utility
+ * Convert markdown-like content to HTML
+ * Handles basic markdown syntax for rendering personalized content
  */
-function escapeHtml(text: string): string {
+function convertMarkdownToHTML(markdown: string): string {
+  let html = markdown;
+
+  // Escape dangerous HTML to prevent XSS
+  const dangerousPatterns = /<script|<iframe|<object|<embed|javascript:/gi;
+  if (dangerousPatterns.test(html)) {
+    console.warn('Potentially dangerous HTML detected, sanitizing...');
+    html = html.replace(dangerousPatterns, '');
+  }
+
+  // Convert code blocks (```language ... ```)
+  html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
+    return `<pre><code class="language-${lang || 'text'}">${escapeCodeBlock(code.trim())}</code></pre>`;
+  });
+
+  // Convert inline code (`code`)
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Convert headers
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+  // Convert bold (**text** or __text__)
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+  // Convert italic (*text* or _text_)
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+  // Convert unordered lists
+  html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+  html = html.replace(/^- (.+)$/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+  // Convert ordered lists
+  html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+
+  // Convert line breaks to paragraphs
+  html = html.split('\n\n').map(para => {
+    if (!para.trim()) return '';
+    if (para.startsWith('<')) return para; // Already HTML
+    return `<p>${para.trim()}</p>`;
+  }).join('\n');
+
+  // Convert single line breaks to <br>
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
+/**
+ * Escape code blocks to prevent HTML injection
+ */
+function escapeCodeBlock(code: string): string {
   const map: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
   };
-  return text.replace(/[&<>"']/g, (char) => map[char]);
+  return code.replace(/[&<>]/g, (char) => map[char]);
 }
 
 export default PersonalizeBtn;

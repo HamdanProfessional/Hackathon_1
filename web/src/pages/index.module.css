@@ -1,6 +1,6 @@
 /* Hero Banner */
 .heroBanner {
-  padding: 4rem 0;
+  padding: 5rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -24,7 +24,7 @@
 
 .heroSubtitle {
   font-size: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   color: var(--ifm-color-primary-dark);
   font-weight: 500;
 }
@@ -33,11 +33,30 @@
   color: var(--ifm-color-primary-light);
 }
 
+.heroDescription {
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.6;
+}
+
 .buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.welcomeMessage {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--ifm-color-primary-dark);
+}
+
+[data-theme='dark'] .welcomeMessage {
+  color: var(--ifm-color-primary-light);
 }
 
 /* Features Section */
@@ -119,7 +138,225 @@
   font-size: 1.5rem;
 }
 
+/* Personalization Section */
+.personalizationSection {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, var(--ifm-color-primary-lightest) 0%, var(--ifm-background-color) 100%);
+}
+
+[data-theme='dark'] .personalizationSection {
+  background: linear-gradient(135deg, var(--ifm-color-primary-darkest) 0%, var(--ifm-background-color) 100%);
+}
+
+.personalizationContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.personalizationText h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-heading-color);
+}
+
+.personalizationText p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 1.5rem;
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefitsList li {
+  padding: 0.75rem 0;
+  padding-left: 2rem;
+  position: relative;
+  color: var(--ifm-color-emphasis-800);
+  font-size: 1rem;
+}
+
+.benefitsList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--ifm-color-primary);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.personalizationVisual {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.hardwareCard {
+  background: var(--ifm-card-background-color);
+  border: 2px solid var(--ifm-color-primary-light);
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hardwareCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: var(--ifm-color-primary);
+}
+
+.hardwareIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.hardwareCard p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+/* Learning Path Section */
+.learningPathSection {
+  padding: 5rem 0;
+  background-color: var(--ifm-background-color);
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-heading-color);
+}
+
+.sectionSubtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--ifm-color-emphasis-700);
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+.pathGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.pathCard {
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pathCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.pathNumber {
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  background: var(--ifm-color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pathCard h3 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-heading-color);
+  font-size: 1.3rem;
+}
+
+.pathCard p {
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.pathDuration {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-dark);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .pathDuration {
+  background: var(--ifm-color-primary-darkest);
+  color: var(--ifm-color-primary-light);
+}
+
+/* Statistics Section */
+.statsSection {
+  padding: 4rem 0;
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] .statsSection {
+  background-color: var(--ifm-color-emphasis-200);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.statCard {
+  text-align: center;
+  padding: 2rem;
+}
+
+.statNumber {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.statLabel {
+  font-size: 1.1rem;
+  color: var(--ifm-color-emphasis-700);
+  font-weight: 500;
+}
+
 /* Responsive */
+@media (max-width: 996px) {
+  .personalizationContent {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .personalizationVisual {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .heroTitle {
     font-size: 2rem;
@@ -129,6 +366,10 @@
     font-size: 1.25rem;
   }
 
+  .heroDescription {
+    font-size: 1rem;
+  }
+
   .featureGrid {
     grid-template-columns: 1fr;
   }
@@ -136,5 +377,27 @@
   .techStackGrid {
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .pathGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sectionTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .personalizationVisual {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
   }
 }

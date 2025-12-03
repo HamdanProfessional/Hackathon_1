@@ -608,3 +608,34 @@ Expected Output: You should see '🔍 Checking DB URL: Loaded ✅' in the consol
     -   *Note:* If using Pydantic v1, use `@validator`. For v2, use `@field_validator`."
 
 ---
+
+/sp.implement "Implement Interactive AI Search (Cmd+K)
+
+**Goal:** Add a fast, vector-based search experience that allows users to find content chunks instantly or escalate to the AI Agent.
+
+### 1. Backend: Search Endpoint (`api/main.py`)
+*   **Action:** Add a lightweight `POST /search` endpoint.
+*   **Logic:**
+    *   Input: `{ query: str, limit: int = 5 }`.
+    *   Process: Generate embedding for `query` (using `openai-agents` client or raw `client.embeddings.create`).
+    *   Query Qdrant: `client.search(collection_name='robotics_textbook', query_vector=..., limit=limit)`.
+    *   Output: List of `{ title, content, url, score }`.
+*   **Note:** This bypasses the LLM generation step for speed (latency < 200ms).
+
+### 2. Frontend: Search Modal Component (`web/src/components/SearchModal.tsx`)
+*   **UI:** A 'Spotlight/Cmd+K' style modal.
+*   **Features:**
+    *   **Trigger:** Open on `Cmd+K` (or `Ctrl+K`) or by clicking a Search Icon.
+    *   **Input:** Auto-focused text field.
+    *   **Results:** List of cards showing the matched text snippet and a link to the page.
+    *   **'Ask AI' Action:** A special list item at the bottom: '✨ Ask AI Agent about "[query]"'. Clicking this closes the modal and opens the `ChatWidget` with the query pre-filled.
+*   **State:** Use `useEffect` to handle the keyboard shortcut.
+
+### 3. Integration: Navbar Search Button (`web/src/components/SearchNavbarItem.tsx`)
+*   **Action:** Create a Navbar Item that looks like a search bar but acts as a trigger.
+*   **UI:** A button styled like an input: `🔍 Search (Cmd+K)...`.
+*   **Logic:** Clicking it sets `isSearchOpen = true` (manage state via a React Context or simple local state if lifted).
+
+### 4. Register Component (`web/src/theme/NavbarItem/ComponentTypes.tsx`)
+*   **Action:** Register `custom-search` mapping to `SearchNavbarItem`.
+*   **Config:** Update `docusaurus.config.ts` to add this item to the Navbar (position: left or right)."

@@ -79,10 +79,25 @@ async function requestHandler(req: http.IncomingMessage, res: http.ServerRespons
     // Route to better-auth handler
     // Note: better-auth returns a Web API Response
     if (pathname.startsWith('/api/auth')) {
+      // Read request body for POST/PUT requests
+      let body: string | undefined;
+      if (req.method === 'POST' || req.method === 'PUT') {
+        body = await new Promise<string>((resolve) => {
+          let data = '';
+          req.on('data', (chunk) => {
+            data += chunk.toString();
+          });
+          req.on('end', () => {
+            resolve(data);
+          });
+        });
+      }
+
       // Convert Node.js IncomingMessage to Web API Request
       const request = new Request(`http://${req.headers.host}${req.url}`, {
         method: req.method,
         headers: req.headers as any,
+        body: body,
       });
 
       const response = await auth.handler(request);

@@ -5,7 +5,7 @@ Provides common utilities that can be used by multiple specialized agents
 from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
 from typing import List, Dict, Any
-from core.config import settings
+from src.core.config import settings
 
 # Initialize clients
 embedding_client = AsyncOpenAI(

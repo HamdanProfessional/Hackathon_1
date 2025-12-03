@@ -5,8 +5,8 @@ Each agent has a distinct personality and purpose but shares the same tools
 import traceback
 from openai import AsyncOpenAI
 from typing import Optional, List, Dict, Any
-from core.config import settings
-from tools import search_textbook, SEARCH_TEXTBOOK_TOOL
+from src.core.config import settings
+from src.tools import search_textbook, SEARCH_TEXTBOOK_TOOL
 
 # Initialize AsyncOpenAI client with Gemini configuration
 openai_client = AsyncOpenAI(

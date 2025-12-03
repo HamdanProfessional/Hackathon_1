@@ -4,17 +4,42 @@ import { authClient } from '@site/src/lib/auth-client';
 import styles from './login.module.css';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
-type HardwareOption = 'RTX 4090' | 'Jetson Orin' | 'Laptop CPU' | 'Google Colab';
+// Valid values from database schema
+type HardwareOption = 'RTX4090' | 'Jetson' | 'Laptop' | 'Cloud';
 type SkillLevel = 'Beginner' | 'Advanced';
 
-const HARDWARE_OPTIONS: HardwareOption[] = [
-  'RTX 4090',
-  'Jetson Orin',
-  'Laptop CPU',
-  'Google Colab'
+// Questions to understand user's background
+const HARDWARE_QUESTIONS = [
+  {
+    question: 'What hardware do you have access to for robotics projects?',
+    options: [
+      { value: 'RTX4090', label: 'High-end GPU (RTX 4090, RTX 4080, etc.)' },
+      { value: 'Jetson', label: 'NVIDIA Jetson (Orin, Xavier, Nano)' },
+      { value: 'Laptop', label: 'Just my laptop/desktop CPU' },
+      { value: 'Cloud', label: 'Cloud/Colab (no local hardware)' },
+    ]
+  }
 ];
 
-const SKILL_LEVEL_OPTIONS: SkillLevel[] = ['Beginner', 'Advanced'];
+const EXPERIENCE_QUESTIONS = [
+  {
+    question: 'Have you worked with robotics or ROS before?',
+    options: [
+      { value: 'none', label: 'No, I\'m completely new to this' },
+      { value: 'basic', label: 'I\'ve done some tutorials or simple projects' },
+      { value: 'intermediate', label: 'I\'ve built a few robots or worked with ROS' },
+      { value: 'advanced', label: 'I have professional experience' },
+    ]
+  },
+  {
+    question: 'How comfortable are you with Python programming?',
+    options: [
+      { value: 'beginner', label: 'Just starting out or basic knowledge' },
+      { value: 'intermediate', label: 'Can write scripts and understand OOP' },
+      { value: 'advanced', label: 'Proficient with advanced concepts' },
+    ]
+  }
+];
 
 export default function Login(): JSX.Element {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,8 +50,27 @@ export default function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [hardwareBg, setHardwareBg] = useState<HardwareOption>('Laptop CPU');
-  const [skillLevel, setSkillLevel] = useState<SkillLevel>('Beginner');
+
+  // Conversational question answers
+  const [hardwareAnswer, setHardwareAnswer] = useState<string>('');
+  const [roboticsExperience, setRoboticsExperience] = useState<string>('');
+  const [pythonSkill, setPythonSkill] = useState<string>('');
+
+  // Derive hardware_bg from hardware answer (direct mapping)
+  const deriveHardwareBg = (): HardwareOption => {
+    return (hardwareAnswer as HardwareOption) || 'Laptop';
+  };
+
+  // Derive skill_level from robotics experience and Python skill
+  const deriveSkillLevel = (): SkillLevel => {
+    // Beginner: New to robotics (none/basic) AND beginner at Python
+    // Advanced: Otherwise
+    if ((roboticsExperience === 'none' || roboticsExperience === 'basic') &&
+        pythonSkill === 'beginner') {
+      return 'Beginner';
+    }
+    return 'Advanced';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,14 +79,18 @@ export default function Login(): JSX.Element {
 
     try {
       if (isSignUp) {
+        // Derive values from conversational answers
+        const hardware_bg = deriveHardwareBg();
+        const skill_level = deriveSkillLevel();
+
         // Sign up with hardware preferences and skill level
         const response = await authClient.signUp.email({
           email,
           password,
           name,
           // @ts-ignore - Better-Auth allows custom fields
-          hardwareBg,
-          skillLevel,
+          hardware_bg,
+          skill_level,
         });
 
         // Check for errors in response
@@ -147,56 +195,75 @@ export default function Login(): JSX.Element {
 
             {isSignUp && (
               <>
+                {/* Hardware Question */}
                 <div className={styles.formGroup}>
-                  <label htmlFor="hardware" className={styles.label}>
-                    Hardware Setup
-                    <span className={styles.labelHint}>
-                      (We'll personalize content for your hardware)
-                    </span>
+                  <label className={styles.label}>
+                    {HARDWARE_QUESTIONS[0].question}
                   </label>
-                  <select
-                    id="hardware"
-                    value={hardwareBg}
-                    onChange={(e) => setHardwareBg(e.target.value as HardwareOption)}
-                    required={isSignUp}
-                    className={styles.select}
-                  >
-                    {HARDWARE_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
+                  <div className={styles.radioGroup}>
+                    {HARDWARE_QUESTIONS[0].options.map((option) => (
+                      <label key={option.value} className={styles.radioOption}>
+                        <input
+                          type="radio"
+                          name="hardware"
+                          value={option.value}
+                          checked={hardwareAnswer === option.value}
+                          onChange={(e) => setHardwareAnswer(e.target.value)}
+                          required={isSignUp}
+                        />
+                        <span>{option.label}</span>
+                      </label>
                     ))}
-                  </select>
-                  <p className={styles.hint}>
-                    Choose the hardware you'll be using for robotics projects. This helps us
-                    tailor code examples and performance guidance.
-                  </p>
+                  </div>
                 </div>
 
+                {/* Robotics Experience Question */}
                 <div className={styles.formGroup}>
-                  <label htmlFor="skillLevel" className={styles.label}>
-                    Skill Level
-                    <span className={styles.labelHint}>
-                      (Adjusts content complexity)
-                    </span>
+                  <label className={styles.label}>
+                    {EXPERIENCE_QUESTIONS[0].question}
                   </label>
-                  <select
-                    id="skillLevel"
-                    value={skillLevel}
-                    onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-                    required={isSignUp}
-                    className={styles.select}
-                  >
-                    {SKILL_LEVEL_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
+                  <div className={styles.radioGroup}>
+                    {EXPERIENCE_QUESTIONS[0].options.map((option) => (
+                      <label key={option.value} className={styles.radioOption}>
+                        <input
+                          type="radio"
+                          name="roboticsExperience"
+                          value={option.value}
+                          checked={roboticsExperience === option.value}
+                          onChange={(e) => setRoboticsExperience(e.target.value)}
+                          required={isSignUp}
+                        />
+                        <span>{option.label}</span>
+                      </label>
                     ))}
-                  </select>
-                  <p className={styles.hint}>
-                    <strong>Beginner:</strong> Simple explanations with analogies, focus on "why"
-                    <br />
-                    <strong>Advanced:</strong> Technical depth, performance optimization, implementation details
+                  </div>
+                </div>
+
+                {/* Python Skill Question */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    {EXPERIENCE_QUESTIONS[1].question}
+                  </label>
+                  <div className={styles.radioGroup}>
+                    {EXPERIENCE_QUESTIONS[1].options.map((option) => (
+                      <label key={option.value} className={styles.radioOption}>
+                        <input
+                          type="radio"
+                          name="pythonSkill"
+                          value={option.value}
+                          checked={pythonSkill === option.value}
+                          onChange={(e) => setPythonSkill(e.target.value)}
+                          required={isSignUp}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.hint}>
+                  <p style={{ marginBottom: '8px' }}>
+                    <strong>Why we ask:</strong> We'll personalize code examples and explanations based on your answers.
                   </p>
                 </div>
               </>

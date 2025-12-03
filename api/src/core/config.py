@@ -39,17 +39,17 @@ class Settings(BaseSettings):
     def check_protocol(cls, v: str) -> str:
         """Ensure OPENAI_API_BASE has http:// or https:// protocol"""
         if not v:
-            print(f"⚠️  WARNING: OPENAI_API_BASE is empty!")
+            print("[WARNING] OPENAI_API_BASE is empty!")
             return v
 
         if not v.startswith(("http://", "https://")):
-            print(f"🔧 Auto-fixing OPENAI_API_BASE: adding https:// prefix")
+            print("[FIX] Auto-fixing OPENAI_API_BASE: adding https:// prefix")
             print(f"   Before: {v}")
             fixed = f"https://{v}"
             print(f"   After:  {fixed}")
             return fixed
 
-        print(f"✅ OPENAI_API_BASE validated: {v}")
+        print(f"[OK] OPENAI_API_BASE validated: {v}")
         return v
 
     model_config = SettingsConfigDict(

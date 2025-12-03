@@ -20,7 +20,14 @@
       "Bash(cat:*)",
       "Bash(node -e:*)",
       "Bash(node test-env.js:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(node run-migration.js:*)"
     ],
     "deny": [],
     "ask": []

@@ -5,8 +5,8 @@ Uses lightweight LLM to classify user intent and route to appropriate specialize
 import traceback
 from openai import AsyncOpenAI
 from typing import Dict, Any, Optional, List
-from core.config import settings
-from agents import tutor_agent, quiz_agent, coder_agent
+from src.core.config import settings
+from src.agents import tutor_agent, quiz_agent, coder_agent
 
 # Initialize lightweight OpenAI client for intent classification
 intent_client = AsyncOpenAI(
@@ -58,7 +58,7 @@ Classification:"""
 
     try:
         response = await intent_client.chat.completions.create(
-            model="gemini-2.0-flash-exp",  # Fast model for classification
+            model="gemini-2.5-flash",  # Fast model for classification
             messages=[
                 {"role": "user", "content": classification_prompt.format(query=query)}
             ],

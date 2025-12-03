@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { useSession, signOut } from '@site/src/lib/auth-client';
+import { useSession, authClient } from '@site/src/lib/auth-client';
 import Link from '@docusaurus/Link';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
@@ -40,10 +40,34 @@ export default function AuthNavbarItem() {
         <button
           className="button button--secondary button--sm"
           onClick={async () => {
-            await signOut();
-            // Reload page after logout to clear UI state
-            if (ExecutionEnvironment.canUseDOM) {
-              window.location.href = '/';
+            try {
+              console.log('🔄 Attempting to sign out...');
+              const result = await authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    console.log('✅ Sign out success callback triggered');
+                  },
+                  onError: (ctx) => {
+                    console.error('❌ Sign out error callback:', ctx.error);
+                  }
+                }
+              });
+              console.log('✅ Sign out result:', result);
+
+              // Force reload to clear all state
+              if (ExecutionEnvironment.canUseDOM) {
+                // Clear any cached session data
+                sessionStorage.clear();
+                // Redirect to home
+                window.location.href = '/';
+              }
+            } catch (error) {
+              console.error('❌ Logout error:', error);
+              // Still redirect even if there's an error
+              if (ExecutionEnvironment.canUseDOM) {
+                sessionStorage.clear();
+                window.location.href = '/';
+              }
             }
           }}
           style={{ cursor: 'pointer' }}

@@ -8,8 +8,8 @@ from pathlib import Path
 
 # Load .env from repository root (two levels up from this file)
 env_path = Path(__file__).parent.parent.parent / ".env"
-print(f"🔍 Loading .env from: {env_path}")
-print(f"🔍 .env exists: {env_path.exists()}")
+print(f"Loading .env from: {env_path}")
+print(f".env exists: {env_path.exists()}")
 load_dotenv(dotenv_path=env_path, override=True)
 
 import os
@@ -17,12 +17,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from core.config import settings
-from router import route_request
+from src.core.config import settings
+from src.router import route_request
 
 # Debug: Verify configuration on startup
 print("=" * 60)
-print("🔧 API Configuration Debug")
+print("API Configuration Debug")
 print("=" * 60)
 print(f"DEBUG: OPENAI_API_BASE = {os.getenv('OPENAI_API_BASE')}")
 print(f"DEBUG: GEMINI_API_KEY Loaded = {bool(os.getenv('GEMINI_API_KEY'))}")
@@ -192,15 +192,24 @@ Important:
 
         personalized_text = response.choices[0].message.content
 
+        # Ensure we got valid content back
+        if not personalized_text:
+            raise ValueError("LLM returned empty response")
+
         return PersonalizeResponse(
             personalized_content=personalized_text
         )
 
     except Exception as e:
-        # Debugging print to help you see if it fails
-        print(f"❌ Personalization Error: {e}")
+        # Debugging: Print full error traceback
+        import traceback
+        print(f"[ERROR] Personalization Error: {e}")
+        traceback.print_exc()
+
+        # Return error in a format the frontend can handle
+        # Note: We still return 200 status with error message embedded
         return PersonalizeResponse(
-            personalized_content=f"Error personalizing content: {str(e)}"
+            personalized_content=f"Unable to personalize content: {str(e)}\n\nPlease try again or contact support if the issue persists."
         )
 
 

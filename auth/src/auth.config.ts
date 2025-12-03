@@ -42,6 +42,7 @@ const db = drizzle(sql as any, { schema });
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
+    schema: schema,
     // Note: We rely on the default table names (user, session, etc.)
     // defined in your schema.ts
   }),
