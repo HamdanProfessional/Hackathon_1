@@ -18,6 +18,12 @@ const config = {
 
   onBrokenLinks: 'warn',
 
+  // Custom fields for backend API URLs
+  customFields: {
+    apiUrl: process.env.API_URL || 'https://api-6c3ak103z-hamdanprofessionals-projects.vercel.app',
+    authUrl: process.env.AUTH_URL || 'https://auth-1d067e7vm-hamdanprofessionals-projects.vercel.app',
+  },
+
   // Folder-based routing (NOT i18n plugin per research.md)
   presets: [
     [
