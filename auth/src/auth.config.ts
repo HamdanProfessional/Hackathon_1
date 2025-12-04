@@ -83,11 +83,11 @@ export const auth = betterAuth({
    */
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, 
+    requireEmailVerification: false,
   },
 
   username: {
-    enabled: true,
+    enabled: false,  // Disabled - only using email/password
   },
 
   /**
