@@ -51,13 +51,14 @@ export default function Login(): JSX.Element {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  // Conversational question answers
-  const [hardwareAnswer, setHardwareAnswer] = useState<string>('');
-  const [roboticsExperience, setRoboticsExperience] = useState<string>('');
-  const [pythonSkill, setPythonSkill] = useState<string>('');
+  // Conversational question answers - default to first option
+  const [hardwareAnswer, setHardwareAnswer] = useState<string>('Laptop');
+  const [roboticsExperience, setRoboticsExperience] = useState<string>('none');
+  const [pythonSkill, setPythonSkill] = useState<string>('beginner');
 
   // Derive hardware_bg from hardware answer (direct mapping)
   const deriveHardwareBg = (): HardwareOption => {
+    // Always return a valid value, defaulting to Laptop
     return (hardwareAnswer as HardwareOption) || 'Laptop';
   };
 
@@ -220,7 +221,6 @@ export default function Login(): JSX.Element {
                           value={option.value}
                           checked={hardwareAnswer === option.value}
                           onChange={(e) => setHardwareAnswer(e.target.value)}
-                          required={isSignUp}
                         />
                         <span>{option.label}</span>
                       </label>
@@ -242,7 +242,6 @@ export default function Login(): JSX.Element {
                           value={option.value}
                           checked={roboticsExperience === option.value}
                           onChange={(e) => setRoboticsExperience(e.target.value)}
-                          required={isSignUp}
                         />
                         <span>{option.label}</span>
                       </label>
@@ -264,7 +263,6 @@ export default function Login(): JSX.Element {
                           value={option.value}
                           checked={pythonSkill === option.value}
                           onChange={(e) => setPythonSkill(e.target.value)}
-                          required={isSignUp}
                         />
                         <span>{option.label}</span>
                       </label>
