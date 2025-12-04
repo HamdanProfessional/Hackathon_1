@@ -56,10 +56,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Lazy load auth config only when needed
       const { auth } = await import('../src/auth.config.js');
 
-      // Get request body
-      const body = req.method === 'POST' || req.method === 'PUT'
-        ? JSON.stringify(req.body)
-        : undefined;
+      // Get request body - Vercel already parses JSON, so we need to stringify it back
+      // for the Web API Request constructor
+      let body: string | undefined = undefined;
+      if ((req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') && req.body) {
+        // Only stringify if body exists and is an object
+        body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      }
 
       // Convert Vercel request to Web API Request
       const url = `https://${req.headers.host}${req.url}`;
