@@ -1,10 +1,24 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { toNodeHandler } from 'better-auth/node';
 
 /**
  * Vercel Serverless Function for Authentication
  *
  * This function handles all authentication requests in a serverless environment
+ * Uses better-auth's toNodeHandler for proper request handling
  */
+
+// Lazy load auth instance
+let authHandler: any = null;
+
+async function getAuthHandler() {
+  if (!authHandler) {
+    const { auth } = await import('../src/auth.config.js');
+    authHandler = toNodeHandler(auth);
+  }
+  return authHandler;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
   const origin = req.headers.origin || '';
@@ -51,47 +65,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Route to better-auth handler (lazy load)
+    // Route to better-auth handler using Node.js adapter
     if (pathname.startsWith('/api/auth')) {
-      // Lazy load auth config only when needed
-      const { auth } = await import('../src/auth.config.js');
-
-      // Get request body - Vercel already parses JSON, so we need to stringify it back
-      // for the Web API Request constructor
-      let body: string | undefined = undefined;
-      if ((req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') && req.body) {
-        // Only stringify if body exists and is an object
-        body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-      }
-
-      // Convert Vercel request to Web API Request
-      const url = `https://${req.headers.host}${req.url}`;
-      const request = new Request(url, {
-        method: req.method as string,
-        headers: req.headers as any,
-        body: body,
-      });
-
-      const response = await auth.handler(request);
-
-      if (response) {
-        // Convert Web API Response to Vercel response
-        const headers: Record<string, string> = {};
-        response.headers.forEach((value, key) => {
-          headers[key] = value;
-        });
-
-        // Set headers
-        Object.entries(headers).forEach(([key, value]) => {
-          res.setHeader(key, value);
-        });
-
-        // Get response body
-        const responseText = await response.text();
-
-        res.status(response.status).send(responseText);
-        return;
-      }
+      const handler = await getAuthHandler();
+      return handler(req, res);
     }
 
     // 404
@@ -100,7 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('Error handling request:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? (error as Error).stack : undefined
     });
   }
 }
