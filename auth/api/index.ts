@@ -67,33 +67,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Route to better-auth handler using Node.js adapter
     if (pathname.startsWith('/api/auth')) {
-      // Don't log or access req.body - let toNodeHandler handle it
       console.log(`📥 Auth request: ${req.method} ${pathname}`);
+      console.log(`📥 Request headers:`, JSON.stringify(req.headers, null, 2));
 
       const handler = await getAuthHandler();
 
-      // Intercept the response to log it
-      const originalEnd = res.end;
-      const originalSend = res.send;
-      const originalJson = res.json;
-
-      let responseBody: any = null;
-
-      res.send = function(body: any) {
-        responseBody = body;
-        console.log(`📤 Auth response status: ${res.statusCode}`);
-        console.log(`📤 Auth response body:`, typeof body === 'string' ? body : JSON.stringify(body));
-        return originalSend.call(this, body);
-      };
-
-      res.json = function(body: any) {
-        responseBody = body;
-        console.log(`📤 Auth response status: ${res.statusCode}`);
-        console.log(`📤 Auth response body:`, JSON.stringify(body));
-        return originalJson.call(this, body);
-      };
-
-      return handler(req, res);
+      // Wrap in a promise to catch when handler completes
+      try {
+        const result = await handler(req, res);
+        console.log(`✅ Handler completed`);
+        console.log(`📤 Final status code: ${res.statusCode}`);
+        console.log(`📤 Response sent: ${res.writableEnded}`);
+        return result;
+      } catch (error) {
+        console.error(`❌ Handler error:`, error);
+        console.error(`Error details:`, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        throw error;
+      }
     }
 
     // 404

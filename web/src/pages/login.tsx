@@ -92,15 +92,12 @@ export default function Login(): JSX.Element {
           hasPassword: !!password,
         });
 
-        // Sign up with hardware preferences and skill level
-        // Using email as name for simplicity
+        // Sign up with ONLY required fields - let custom fields use defaults
+        // Better-auth might not accept custom fields in sign-up call
         const response = await authClient.signUp.email({
           email,
           password,
           name: email, // Use email as name
-          // @ts-ignore - Better-Auth allows custom fields
-          hardware_bg,
-          skill_level,
         });
 
         console.log('📬 Sign up response:', response);
