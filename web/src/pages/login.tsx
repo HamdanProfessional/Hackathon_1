@@ -51,10 +51,10 @@ export default function Login(): JSX.Element {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  // Conversational question answers - default to first option
-  const [hardwareAnswer, setHardwareAnswer] = useState<string>('Laptop');
-  const [roboticsExperience, setRoboticsExperience] = useState<string>('none');
-  const [pythonSkill, setPythonSkill] = useState<string>('beginner');
+  // Conversational question answers - optional, no default selection
+  const [hardwareAnswer, setHardwareAnswer] = useState<string>('');
+  const [roboticsExperience, setRoboticsExperience] = useState<string>('');
+  const [pythonSkill, setPythonSkill] = useState<string>('');
 
   // Derive hardware_bg from hardware answer (direct mapping)
   const deriveHardwareBg = (): HardwareOption => {
