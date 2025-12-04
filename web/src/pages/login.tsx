@@ -86,17 +86,18 @@ export default function Login(): JSX.Element {
 
         console.log('🔐 Sign up attempt with:', {
           email,
-          name,
+          name: email, // Using email as name
           hardware_bg,
           skill_level,
           hasPassword: !!password,
         });
 
         // Sign up with hardware preferences and skill level
+        // Using email as name for simplicity
         const response = await authClient.signUp.email({
           email,
           password,
-          name,
+          name: email, // Use email as name
           // @ts-ignore - Better-Auth allows custom fields
           hardware_bg,
           skill_level,
@@ -157,23 +158,6 @@ export default function Login(): JSX.Element {
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            {isSignUp && (
-              <div className={styles.formGroup}>
-                <label htmlFor="name" className={styles.label}>
-                  Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  required={isSignUp}
-                  className={styles.input}
-                />
-              </div>
-            )}
-
             <div className={styles.formGroup}>
               <label htmlFor="email" className={styles.label}>
                 Email
