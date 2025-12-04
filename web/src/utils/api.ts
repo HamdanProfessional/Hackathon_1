@@ -22,7 +22,7 @@ class ApiClient {
   // Hardcoded production URLs for GitHub Pages deployment
   // For local development, change these to http://localhost:8000 and http://localhost:3001
   private pythonBaseUrl = 'https://api-1x42fpntr-hamdanprofessionals-projects.vercel.app';
-  private authBaseUrl = 'https://auth-69dii0geb-hamdanprofessionals-projects.vercel.app';
+  private authBaseUrl = 'https://auth-l7j5pz8vd-hamdanprofessionals-projects.vercel.app';
   private tokenKey = 'session_token';
 
   constructor() {

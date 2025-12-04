@@ -67,6 +67,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Route to better-auth handler using Node.js adapter
     if (pathname.startsWith('/api/auth')) {
+      console.log(`📥 Auth request: ${req.method} ${pathname}`);
+      if (req.body) {
+        console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
+      }
+
       const handler = await getAuthHandler();
       return handler(req, res);
     }

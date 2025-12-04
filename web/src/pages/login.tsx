@@ -83,6 +83,14 @@ export default function Login(): JSX.Element {
         const hardware_bg = deriveHardwareBg();
         const skill_level = deriveSkillLevel();
 
+        console.log('🔐 Sign up attempt with:', {
+          email,
+          name,
+          hardware_bg,
+          skill_level,
+          hasPassword: !!password,
+        });
+
         // Sign up with hardware preferences and skill level
         const response = await authClient.signUp.email({
           email,
@@ -93,8 +101,11 @@ export default function Login(): JSX.Element {
           skill_level,
         });
 
+        console.log('📬 Sign up response:', response);
+
         // Check for errors in response
         if (response.error) {
+          console.error('❌ Sign up error:', response.error);
           setError(response.error.message || 'Sign up failed');
           setLoading(false);
           return;
