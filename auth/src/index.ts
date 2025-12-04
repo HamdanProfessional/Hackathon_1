@@ -16,7 +16,7 @@ config({ path: resolve(__dirname, '../../.env'), override: true });
 console.log("🔍 Checking DB URL:", process.env.DATABASE_URL ? "Loaded ✅" : "Missing ❌");
 console.log("🔍 DB URL value:", process.env.DATABASE_URL?.substring(0, 30) + "...");
 
-import { auth } from './auth.config';
+import { auth } from './auth.config.js';
 import http from 'http';
 import url from 'url';
 

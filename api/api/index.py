@@ -16,8 +16,11 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for now
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=[
+        "http://localhost:3000",
+        "https://hamdanprofessional.github.io",
+    ],
+    allow_origin_regex=r"https://.*\.(vercel\.app|github\.io)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,7 +71,7 @@ async def chat(request: dict):
 
         # Call LLM
         response = await client.chat.completions.create(
-            model="gemini-2.0-flash-exp",
+            model="gemini-2.5-flash",
             messages=messages,
             temperature=0.7,
             max_tokens=1000
@@ -82,9 +85,11 @@ async def chat(request: dict):
         }
     except Exception as e:
         import traceback
-        traceback.print_exc()
+        error_details = traceback.format_exc()
+        print(f"ERROR: {error_details}")
         return {
             "response": f"I apologize, but I'm having trouble connecting right now. Error: {str(e)}",
+            "error_details": error_details,
             "sources": [],
             "agent_type": "error",
             "intent": "ERROR"
@@ -108,7 +113,7 @@ async def personalize(request: dict):
         system_prompt = f"""Adapt this content for a {skill_level} learner with {hardware_bg} hardware background."""
 
         response = await client.chat.completions.create(
-            model="gemini-2.0-flash-exp",
+            model="gemini-2.5-flash",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Adapt:\n\n{content}"}

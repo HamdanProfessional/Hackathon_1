@@ -102,7 +102,7 @@ export default function Login(): JSX.Element {
 
         // Redirect to first chapter only on success
         if (ExecutionEnvironment.canUseDOM) {
-          window.location.href = '/docs/en/intro';
+          window.location.href = '/Hackathon_1/docs/en/intro';
         }
       } else {
         // Sign in
@@ -120,7 +120,7 @@ export default function Login(): JSX.Element {
 
         // Redirect to first chapter only on success
         if (ExecutionEnvironment.canUseDOM) {
-          window.location.href = '/docs/en/intro';
+          window.location.href = '/Hackathon_1/docs/en/intro';
         }
       }
     } catch (err) {

@@ -9,13 +9,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
   const origin = req.headers.origin || '';
 
-  if (origin.includes('localhost') || origin.endsWith('.vercel.app')) {
+  // Allow GitHub Pages, localhost, and Vercel deployments
+  if (origin.includes('localhost') ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.github.io')) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
 
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -51,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Route to better-auth handler (lazy load)
     if (pathname.startsWith('/api/auth')) {
       // Lazy load auth config only when needed
-      const { auth } = await import('../src/auth.config');
+      const { auth } = await import('../src/auth.config.js');
 
       // Get request body
       const body = req.method === 'POST' || req.method === 'PUT'

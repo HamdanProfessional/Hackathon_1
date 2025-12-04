@@ -19,13 +19,14 @@ interface ApiResponse<T = any> {
 }
 
 class ApiClient {
-  private pythonBaseUrl: string;
-  private authBaseUrl: string;
+  // Hardcoded production URLs for GitHub Pages deployment
+  // For local development, change these to http://localhost:8000 and http://localhost:3001
+  private pythonBaseUrl = 'https://api-1x42fpntr-hamdanprofessionals-projects.vercel.app';
+  private authBaseUrl = 'https://auth-4g2ohkeew-hamdanprofessionals-projects.vercel.app';
   private tokenKey = 'session_token';
 
-  constructor(pythonBaseUrl = 'http://localhost:8000', authBaseUrl = 'http://localhost:3001') {
-    this.pythonBaseUrl = pythonBaseUrl;
-    this.authBaseUrl = authBaseUrl;
+  constructor() {
+    // URLs are hardcoded above
   }
 
   /**
@@ -306,28 +307,8 @@ class ApiClient {
   }
 }
 
-// Get backend URLs from environment variables or use defaults
-const getBackendUrls = () => {
-  // For Docusaurus, we can use customFields in config or browser globals
-  if (typeof window !== 'undefined' && (window as any).docusaurus?.siteConfig?.customFields) {
-    const customFields = (window as any).docusaurus.siteConfig.customFields;
-    return {
-      apiUrl: customFields.apiUrl || 'http://localhost:8000',
-      authUrl: customFields.authUrl || 'http://localhost:3001',
-    };
-  }
-
-  // Fallback to localhost for local development
-  return {
-    apiUrl: 'http://localhost:8000',
-    authUrl: 'http://localhost:3001',
-  };
-};
-
-const { apiUrl, authUrl } = getBackendUrls();
-
-// Export singleton instance with environment-based URLs
-export const apiClient = new ApiClient(apiUrl, authUrl);
+// Export singleton instance
+export const apiClient = new ApiClient();
 
 // Export class for testing/customization
 export default ApiClient;

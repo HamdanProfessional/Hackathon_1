@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ChatWidget from '@site/src/components/ChatWidget';
+import SessionDebug from '@site/src/components/SessionDebug';
 import { ChatProvider } from '@site/src/context/ChatContext';
 
 // Default implementation, that you can customize
 export default function Root({children}) {
-  // Only render ChatWidget on the client side to avoid hydration errors
+  // Only render client-side components to avoid hydration errors
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -14,7 +15,12 @@ export default function Root({children}) {
   return (
     <ChatProvider>
       {children}
-      {isClient && <ChatWidget />}
+      {isClient && (
+        <>
+          <ChatWidget />
+          <SessionDebug />
+        </>
+      )}
     </ChatProvider>
   );
 }

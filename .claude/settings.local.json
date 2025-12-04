@@ -41,7 +41,10 @@
       "Bash(vercel logs:*)",
       "Bash(printf:*)",
       "Bash(openssl rand:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx cross-env GIT_USER=HamdanProfessional npm run deploy:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

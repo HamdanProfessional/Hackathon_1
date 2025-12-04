@@ -55,6 +55,10 @@ const config = {
             label: 'Textbook',
           },
           {
+            type: 'custom-languageToggle',
+            position: 'right',
+          },
+          {
             type: 'custom-authNavbarItem',
             position: 'right',
           },

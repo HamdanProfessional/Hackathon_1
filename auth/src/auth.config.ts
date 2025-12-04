@@ -1,6 +1,11 @@
 // 1. LOAD ENV VARS FIRST
 import { config } from 'dotenv';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load .env from parent directory (repository root)
 // override: true forces .env to override system environment variables
@@ -16,7 +21,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from './db/schema';
+import * as schema from './db/schema.js';
 
 // 2. VALIDATE ENV VARS
 // Ensure DATABASE_URL is set in your .env file inside the /auth folder
@@ -90,13 +95,34 @@ export const auth = betterAuth({
    */
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, 
+    updateAge: 60 * 60 * 24,
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5, // 5 minutes
+    },
   },
+
+  // Cookie configuration for cross-domain
+  // Note: Cross-domain cookies between github.io and vercel.app won't work
+  // Better-auth will fall back to client-side storage (localStorage)
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: false, // Changed from true - doesn't work across different domains
+    },
+    cookiePrefix: 'auth',
+    useSecureCookies: process.env.NODE_ENV === 'production',
+  },
+
+  // Disable secure cookies for cross-domain to allow localStorage fallback
+  trustedOrigins: [
+    'https://hamdanprofessional.github.io',
+  ],
 
   cors: {
     origin: [
-      'http://localhost:3000', 
-      'http://localhost:8000', 
+      'http://localhost:3000',
+      'http://localhost:8000',
+      'https://hamdanprofessional.github.io',
       process.env.FRONTEND_URL || '',
     ].filter(Boolean),
     credentials: true,
