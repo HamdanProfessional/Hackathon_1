@@ -71,6 +71,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`📥 Auth request: ${req.method} ${pathname}`);
 
       const handler = await getAuthHandler();
+
+      // Intercept the response to log it
+      const originalEnd = res.end;
+      const originalSend = res.send;
+      const originalJson = res.json;
+
+      let responseBody: any = null;
+
+      res.send = function(body: any) {
+        responseBody = body;
+        console.log(`📤 Auth response status: ${res.statusCode}`);
+        console.log(`📤 Auth response body:`, typeof body === 'string' ? body : JSON.stringify(body));
+        return originalSend.call(this, body);
+      };
+
+      res.json = function(body: any) {
+        responseBody = body;
+        console.log(`📤 Auth response status: ${res.statusCode}`);
+        console.log(`📤 Auth response body:`, JSON.stringify(body));
+        return originalJson.call(this, body);
+      };
+
       return handler(req, res);
     }
 

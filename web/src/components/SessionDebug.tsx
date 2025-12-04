@@ -84,7 +84,7 @@ export default function SessionDebug() {
       <div style={{ marginBottom: '10px' }}>
         <strong>Auth Base URL:</strong>
         <pre style={{ margin: '5px 0', whiteSpace: 'pre-wrap' }}>
-          https://auth-n9htfaj7s-hamdanprofessionals-projects.vercel.app
+          https://auth-a6oouwe6f-hamdanprofessionals-projects.vercel.app
         </pre>
       </div>
 
