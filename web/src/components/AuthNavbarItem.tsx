@@ -5,25 +5,58 @@
  * Shows login button for guests, user info + logout for authenticated users
  */
 
-import React from 'react';
-import { useSession, authClient } from '@site/src/lib/auth-client';
+import React, { useState, useEffect } from 'react';
+import { getCurrentUser, logout, isAuthenticated } from '@site/src/lib/simple-auth-client';
 import Link from '@docusaurus/Link';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
 export default function AuthNavbarItem() {
-  const { data: session, isPending, error } = useSession();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Debug logging for session state
-  React.useEffect(() => {
-    console.log('🔐 AuthNavbarItem Debug:', {
-      session: session,
-      isPending: isPending,
-      error: error,
-      user: session?.user,
-    });
-  }, [session, isPending, error]);
+  // Check authentication state on mount and when storage changes
+  useEffect(() => {
+    if (!ExecutionEnvironment.canUseDOM) {
+      setLoading(false);
+      return;
+    }
 
-  if (isPending) {
+    const checkAuth = () => {
+      const currentUser = getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+      console.log('🔐 Auth state:', { user: currentUser, isAuthenticated: isAuthenticated() });
+    };
+
+    // Check immediately
+    checkAuth();
+
+    // Listen for storage changes (in case user logs in/out in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'auth_token' || e.key === 'auth_user') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    console.log('🔄 Logging out...');
+    logout();
+    setUser(null);
+
+    // Redirect to home
+    if (ExecutionEnvironment.canUseDOM) {
+      window.location.href = '/Hackathon_1/';
+    }
+  };
+
+  if (loading) {
     return (
       <div className="navbar__item">
         <span style={{ opacity: 0.6 }}>Loading...</span>
@@ -31,45 +64,15 @@ export default function AuthNavbarItem() {
     );
   }
 
-  if (session?.user) {
+  if (user) {
     return (
       <div className="navbar__item" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ fontSize: '14px' }}>
-          Hi, <strong>{session.user.name || session.user.email}</strong>
+          Hi, <strong>{user.email}</strong>
         </span>
         <button
           className="button button--secondary button--sm"
-          onClick={async () => {
-            try {
-              console.log('🔄 Attempting to sign out...');
-              const result = await authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    console.log('✅ Sign out success callback triggered');
-                  },
-                  onError: (ctx) => {
-                    console.error('❌ Sign out error callback:', ctx.error);
-                  }
-                }
-              });
-              console.log('✅ Sign out result:', result);
-
-              // Force reload to clear all state
-              if (ExecutionEnvironment.canUseDOM) {
-                // Clear any cached session data
-                sessionStorage.clear();
-                // Redirect to home
-                window.location.href = '/';
-              }
-            } catch (error) {
-              console.error('❌ Logout error:', error);
-              // Still redirect even if there's an error
-              if (ExecutionEnvironment.canUseDOM) {
-                sessionStorage.clear();
-                window.location.href = '/';
-              }
-            }
-          }}
+          onClick={handleLogout}
           style={{ cursor: 'pointer' }}
         >
           Logout
@@ -80,7 +83,7 @@ export default function AuthNavbarItem() {
 
   return (
     <Link
-      to="/login"
+      to="/Hackathon_1/login"
       className="button button--primary button--sm navbar__item"
     >
       Login
