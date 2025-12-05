@@ -4,7 +4,11 @@ title: فزیکل AI اور ہیومنائیڈ روبوٹکس کا تعارف
 sidebar_position: 1
 ---
 
+import PersonalizePrompt from '@site/src/components/PersonalizePrompt';
+
 # فزیکل AI اور ہیومنائیڈ روبوٹکس میں خوش آمدید
+
+<PersonalizePrompt />
 
 ## فزیکل AI کیا ہے؟
 

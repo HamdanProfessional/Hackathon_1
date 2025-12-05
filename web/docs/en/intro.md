@@ -4,7 +4,11 @@ title: Introduction to Physical AI & Humanoid Robotics
 sidebar_position: 1
 ---
 
+import PersonalizePrompt from '@site/src/components/PersonalizePrompt';
+
 # Welcome to Physical AI & Humanoid Robotics
+
+<PersonalizePrompt />
 
 ## What is Physical AI?
 

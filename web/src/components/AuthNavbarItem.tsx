@@ -70,12 +70,6 @@ export default function AuthNavbarItem() {
         <span style={{ fontSize: '14px' }}>
           Hi, <strong>{user.email}</strong>
         </span>
-        <Link
-          to="/Hackathon_1/personalize"
-          className="button button--primary button--sm"
-        >
-          Personalize
-        </Link>
         <button
           className="button button--secondary button--sm"
           onClick={handleLogout}

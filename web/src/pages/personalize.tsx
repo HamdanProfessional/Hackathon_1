@@ -188,23 +188,62 @@ export default function Personalize(): JSX.Element {
         </div>
 
         <div className={styles.features}>
-          <h2>Personalized Features</h2>
+          <h2>🤖 AI Content Generation</h2>
+          <p style={{ marginBottom: '20px', lineHeight: '1.6' }}>
+            Once you save your preferences, you can generate personalized tutorials, code examples,
+            and explanations tailored to your <strong>{hardwareBg || 'hardware'}</strong> and <strong>{skillLevel || 'skill level'}</strong>!
+          </p>
+
+          {hardwareBg && skillLevel ? (
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              padding: '20px',
+              borderRadius: '12px',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ marginTop: 0, marginBottom: '12px' }}>✨ Your Personalized Context</h3>
+              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '8px' }}>
+                <p style={{ margin: '0 0 8px 0' }}><strong>Hardware:</strong> {hardwareBg}</p>
+                <p style={{ margin: 0 }}><strong>Level:</strong> {skillLevel}</p>
+              </div>
+              <p style={{ marginTop: '15px', marginBottom: 0, fontSize: '14px', opacity: 0.9 }}>
+                💡 <em>AI will generate content optimized for your setup! Save your preferences first, then start exploring the textbook.</em>
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              background: '#f8f9fa',
+              border: '2px dashed #dee2e6',
+              padding: '20px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              color: '#6c757d'
+            }}>
+              <p style={{ margin: 0 }}>
+                <strong>👆 Select your hardware and skill level above</strong><br />
+                to unlock AI-powered personalized content generation!
+              </p>
+            </div>
+          )}
+
+          <h3 style={{ marginTop: '30px' }}>What You Can Generate:</h3>
           <ul>
             <li>
-              <span className={styles.icon}>🎯</span>
-              <strong>Hardware-Specific Examples:</strong> Code optimized for your setup
+              <span className={styles.icon}>📝</span>
+              <strong>Custom Tutorials:</strong> Step-by-step guides for your hardware
             </li>
             <li>
-              <span className={styles.icon}>📚</span>
-              <strong>Skill-Appropriate Content:</strong> Explanations matched to your level
+              <span className={styles.icon}>💻</span>
+              <strong>Code Examples:</strong> Optimized for your specific setup
+            </li>
+            <li>
+              <span className={styles.icon}>📖</span>
+              <strong>Explanations:</strong> Matched to your skill level
             </li>
             <li>
               <span className={styles.icon}>⚡</span>
-              <strong>Performance Tips:</strong> Get the most out of your hardware
-            </li>
-            <li>
-              <span className={styles.icon}>🔄</span>
-              <strong>Update Anytime:</strong> Change your preferences as you progress
+              <strong>Performance Tips:</strong> Hardware-specific optimizations
             </li>
           </ul>
         </div>
