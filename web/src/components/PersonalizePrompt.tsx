@@ -36,7 +36,7 @@ export default function PersonalizePrompt() {
 
       console.log('🤖 Generating personalized content for:', { pageTitle, hardware: user?.hardware_bg, skill: user?.skill_level });
 
-      const response = await fetch('https://auth-mtxcsnq9l-hamdanprofessionals-projects.vercel.app/api/personalize', {
+      const response = await fetch('https://auth-hamdanprofessionals-projects.vercel.app/api/personalize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
