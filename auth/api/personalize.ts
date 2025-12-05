@@ -44,9 +44,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       contentLength: pageContent.length
     });
 
-    // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY) {
-      console.warn('⚠️ OPENAI_API_KEY not configured, using mock response');
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn('⚠️ GEMINI_API_KEY not configured, using mock response');
 
       // Return a mock personalized response for testing
       const mockContent = generateMockContent(pageTitle, hardware_bg, skill_level);
@@ -54,19 +54,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Call OpenAI API to generate personalized content
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are an expert technical educator specializing in Physical AI, Robotics, and Machine Learning.
+    // Prepare the prompt for Gemini
+    const systemPrompt = `You are an expert technical educator specializing in Physical AI, Robotics, and Machine Learning.
 Your task is to personalize educational content based on the student's hardware and experience level.
 
 Student Profile:
@@ -80,27 +69,46 @@ Instructions:
 4. Add practical tips and warnings specific to their hardware
 5. Use appropriate technical depth for their skill level
 6. Format the response in clear, readable HTML with proper headings and code blocks
+7. Keep it concise and focused on the key learning points
 
-Keep the core learning objectives the same but tailor the delivery to their profile.`
+Keep the core learning objectives the same but tailor the delivery to their profile.`;
+
+    const userPrompt = `Please personalize this educational content:\n\nTitle: ${pageTitle}\n\nContent:\n${pageContent.substring(0, 4000)}`;
+
+    // Call Gemini API to generate personalized content
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${systemPrompt}\n\n${userPrompt}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
           },
-          {
-            role: 'user',
-            content: `Please personalize this educational content:\n\nTitle: ${pageTitle}\n\nContent:\n${pageContent.substring(0, 4000)}`
-          }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7,
-      }),
-    });
+        }),
+      }
+    );
 
-    if (!openaiResponse.ok) {
-      const errorData = await openaiResponse.json();
-      console.error('OpenAI API error:', errorData);
+    if (!geminiResponse.ok) {
+      const errorData = await geminiResponse.json();
+      console.error('Gemini API error:', errorData);
       throw new Error('Failed to generate personalized content');
     }
 
-    const data = await openaiResponse.json() as any;
-    const generatedContent = data.choices?.[0]?.message?.content || 'No content generated';
+    const data = await geminiResponse.json() as any;
+    const generatedContent = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated';
 
     console.log('✅ Content generated successfully');
 
@@ -136,7 +144,7 @@ ${getHardwareRecommendations(hardware_bg)}
 ${getSkillLevelContent(skill_level)}
 <div style="background: #fff3cd; padding: 16px; border-radius: 8px; margin: 16px 0;">
 <h4>💡 Pro Tip</h4>
-<p>This is a demo response. To get real AI-generated personalized content, configure the OPENAI_API_KEY environment variable in your Vercel deployment.</p>
+<p>This is a demo template response. To enable real AI-powered content generation with Google Gemini 2.0 Flash, configure the GEMINI_API_KEY environment variable in your Vercel deployment. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a></p>
 </div>
 </div>`;
 }
