@@ -16,6 +16,10 @@
       "dest": "/api/add-profile-columns.ts"
     },
     {
+      "src": "/api/personalize",
+      "dest": "/api/personalize.ts"
+    },
+    {
       "src": "/(.*)",
       "dest": "/api/auth.ts"
     }
