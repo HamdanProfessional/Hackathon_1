@@ -11,12 +11,6 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  */
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -25,6 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
+    return;
+  }
+
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
     return;
   }
 
@@ -99,8 +99,8 @@ Keep the core learning objectives the same but tailor the delivery to their prof
       throw new Error('Failed to generate personalized content');
     }
 
-    const data = await openaiResponse.json();
-    const generatedContent = data.choices[0]?.message?.content || 'No content generated';
+    const data = await openaiResponse.json() as any;
+    const generatedContent = data.choices?.[0]?.message?.content || 'No content generated';
 
     console.log('✅ Content generated successfully');
 
