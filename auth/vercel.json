@@ -12,6 +12,10 @@
       "dest": "/api/init-db.ts"
     },
     {
+      "src": "/api/add-profile-columns",
+      "dest": "/api/add-profile-columns.ts"
+    },
+    {
       "src": "/(.*)",
       "dest": "/api/auth.ts"
     }
