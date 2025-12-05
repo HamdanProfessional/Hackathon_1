@@ -4,7 +4,7 @@
  * Lightweight auth client for our custom JWT-based authentication
  */
 
-const AUTH_BASE_URL = 'https://auth-qmb4qcc6u-hamdanprofessionals-projects.vercel.app/api/auth';
+const AUTH_BASE_URL = 'https://auth-85fae38fa-hamdanprofessionals-projects.vercel.app/api/auth';
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
 

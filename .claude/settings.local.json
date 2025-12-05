@@ -46,7 +46,8 @@
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(npm run deploy:*)"
     ],
     "deny": [],
     "ask": []
