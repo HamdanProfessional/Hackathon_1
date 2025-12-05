@@ -11,6 +11,8 @@ const USER_KEY = 'auth_user';
 export interface User {
   id: string;
   email: string;
+  hardware_bg?: string | null;
+  skill_level?: string | null;
   created_at: string;
 }
 
@@ -171,5 +173,57 @@ export async function verifyToken(): Promise<User | null> {
   } catch (error) {
     console.error('Token verification error:', error);
     return null;
+  }
+}
+
+/**
+ * Update user profile
+ */
+export async function updateProfile(profile: {
+  hardware_bg?: string;
+  skill_level?: string;
+}): Promise<AuthResponse> {
+  const token = getToken();
+  if (!token) {
+    return {
+      success: false,
+      error: 'Not authenticated',
+    };
+  }
+
+  try {
+    const response = await fetch(`${AUTH_BASE_URL}/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(profile),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || 'Profile update failed',
+      };
+    }
+
+    // Update user in localStorage
+    if (data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    }
+
+    return {
+      success: true,
+      user: data.user,
+    };
+  } catch (error) {
+    console.error('Profile update error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Network error',
+    };
   }
 }

@@ -158,10 +158,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
       }
 
-      // Get user from database
+      // Get user from database (include profile fields)
       const foundUsers = await db.select({
         id: users.id,
         email: users.email,
+        hardware_bg: users.hardware_bg,
+        skill_level: users.skill_level,
         created_at: users.created_at,
       }).from(users).where(eq(users.id, payload.userId));
 
@@ -173,6 +175,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(200).json({
         success: true,
         user: foundUsers[0],
+      });
+      return;
+    }
+
+    // PUT /api/auth/profile - Update user profile
+    if (pathname.includes('/profile') && req.method === 'PUT') {
+      const token = extractTokenFromHeader(req.headers.authorization as string);
+      if (!token) {
+        res.status(401).json({ error: 'No token provided' });
+        return;
+      }
+
+      const payload = verifyToken(token);
+      if (!payload) {
+        res.status(401).json({ error: 'Invalid or expired token' });
+        return;
+      }
+
+      const { hardware_bg, skill_level } = req.body;
+
+      // Validate input
+      const validHardware = ['RTX4090', 'Jetson', 'Laptop', 'Cloud'];
+      const validSkills = ['Beginner', 'Advanced'];
+
+      if (hardware_bg && !validHardware.includes(hardware_bg)) {
+        res.status(400).json({ error: 'Invalid hardware_bg value' });
+        return;
+      }
+
+      if (skill_level && !validSkills.includes(skill_level)) {
+        res.status(400).json({ error: 'Invalid skill_level value' });
+        return;
+      }
+
+      // Update user profile
+      const updateData: any = {
+        updated_at: new Date(),
+      };
+
+      if (hardware_bg) updateData.hardware_bg = hardware_bg;
+      if (skill_level) updateData.skill_level = skill_level;
+
+      const updatedUsers = await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, payload.userId))
+        .returning({
+          id: users.id,
+          email: users.email,
+          hardware_bg: users.hardware_bg,
+          skill_level: users.skill_level,
+          created_at: users.created_at,
+        });
+
+      console.log(`✅ Profile updated for user: ${payload.email}`);
+
+      res.status(200).json({
+        success: true,
+        user: updatedUsers[0],
       });
       return;
     }
