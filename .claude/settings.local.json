@@ -45,7 +45,8 @@
       "Bash(npx cross-env GIT_USER=HamdanProfessional npm run deploy:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,26 @@
+/**
+ * Simplified Database Schema
+ *
+ * Minimal schema for authentication only
+ * Custom fields can be added later via profile updates
+ */
+
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+
+/**
+ * Users table - minimal fields for authentication
+ */
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').notNull().unique(),
+  password_hash: text('password_hash').notNull(),
+  created_at: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+/**
+ * Type exports for TypeScript
+ */
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

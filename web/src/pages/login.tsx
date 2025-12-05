@@ -1,77 +1,17 @@
 import React, { useState } from 'react';
 import Layout from '@theme/Layout';
-import { authClient } from '@site/src/lib/auth-client';
+import { signUp, login } from '@site/src/lib/simple-auth-client';
 import styles from './login.module.css';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-
-// Valid values from database schema
-type HardwareOption = 'RTX4090' | 'Jetson' | 'Laptop' | 'Cloud';
-type SkillLevel = 'Beginner' | 'Advanced';
-
-// Questions to understand user's background
-const HARDWARE_QUESTIONS = [
-  {
-    question: 'What hardware do you have access to for robotics projects?',
-    options: [
-      { value: 'RTX4090', label: 'High-end GPU (RTX 4090, RTX 4080, etc.)' },
-      { value: 'Jetson', label: 'NVIDIA Jetson (Orin, Xavier, Nano)' },
-      { value: 'Laptop', label: 'Just my laptop/desktop CPU' },
-      { value: 'Cloud', label: 'Cloud/Colab (no local hardware)' },
-    ]
-  }
-];
-
-const EXPERIENCE_QUESTIONS = [
-  {
-    question: 'Have you worked with robotics or ROS before?',
-    options: [
-      { value: 'none', label: 'No, I\'m completely new to this' },
-      { value: 'basic', label: 'I\'ve done some tutorials or simple projects' },
-      { value: 'intermediate', label: 'I\'ve built a few robots or worked with ROS' },
-      { value: 'advanced', label: 'I have professional experience' },
-    ]
-  },
-  {
-    question: 'How comfortable are you with Python programming?',
-    options: [
-      { value: 'beginner', label: 'Just starting out or basic knowledge' },
-      { value: 'intermediate', label: 'Can write scripts and understand OOP' },
-      { value: 'advanced', label: 'Proficient with advanced concepts' },
-    ]
-  }
-];
 
 export default function Login(): JSX.Element {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
+  // Form state - simplified to just email and password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-
-  // Conversational question answers - optional, no default selection
-  const [hardwareAnswer, setHardwareAnswer] = useState<string>('');
-  const [roboticsExperience, setRoboticsExperience] = useState<string>('');
-  const [pythonSkill, setPythonSkill] = useState<string>('');
-
-  // Derive hardware_bg from hardware answer (direct mapping)
-  const deriveHardwareBg = (): HardwareOption => {
-    // Always return a valid value, defaulting to Laptop
-    return (hardwareAnswer as HardwareOption) || 'Laptop';
-  };
-
-  // Derive skill_level from robotics experience and Python skill
-  const deriveSkillLevel = (): SkillLevel => {
-    // Beginner: New to robotics (none/basic) AND beginner at Python
-    // Advanced: Otherwise
-    if ((roboticsExperience === 'none' || roboticsExperience === 'basic') &&
-        pythonSkill === 'beginner') {
-      return 'Beginner';
-    }
-    return 'Advanced';
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,60 +20,44 @@ export default function Login(): JSX.Element {
 
     try {
       if (isSignUp) {
-        // Derive values from conversational answers
-        const hardware_bg = deriveHardwareBg();
-        const skill_level = deriveSkillLevel();
+        console.log('🔐 Sign up attempt:', email);
 
-        console.log('🔐 Sign up attempt with:', {
-          email,
-          name: email, // Using email as name
-          hardware_bg,
-          skill_level,
-          hasPassword: !!password,
-        });
-
-        // Sign up with ONLY required fields - let custom fields use defaults
-        // Better-auth might not accept custom fields in sign-up call
-        const response = await authClient.signUp.email({
-          email,
-          password,
-          name: email, // Use email as name
-        });
+        // Call our custom signup endpoint
+        const response = await signUp(email, password);
 
         console.log('📬 Sign up response:', response);
 
-        // Check for errors in response
-        if (response.error) {
-          console.error('❌ Sign up error:', response.error);
-          setError(response.error.message || 'Sign up failed');
+        if (!response.success) {
+          setError(response.error || 'Sign up failed');
           setLoading(false);
           return;
         }
 
-        // Redirect to first chapter only on success
+        // Redirect to first chapter on success
         if (ExecutionEnvironment.canUseDOM) {
           window.location.href = '/Hackathon_1/docs/en/intro';
         }
       } else {
-        // Sign in
-        const response = await authClient.signIn.email({
-          email,
-          password,
-        });
+        console.log('🔐 Login attempt:', email);
 
-        // Check for errors in response
-        if (response.error) {
-          setError(response.error.message || 'Login failed. Please check your credentials.');
+        // Call our custom login endpoint
+        const response = await login(email, password);
+
+        console.log('📬 Login response:', response);
+
+        if (!response.success) {
+          setError(response.error || 'Login failed. Please check your credentials.');
           setLoading(false);
           return;
         }
 
-        // Redirect to first chapter only on success
+        // Redirect to first chapter on success
         if (ExecutionEnvironment.canUseDOM) {
           window.location.href = '/Hackathon_1/docs/en/intro';
         }
       }
     } catch (err) {
+      console.error('❌ Authentication error:', err);
       setError(err instanceof Error ? err.message : 'Authentication failed');
       setLoading(false);
     }
@@ -186,78 +110,6 @@ export default function Login(): JSX.Element {
               />
             </div>
 
-            {isSignUp && (
-              <>
-                {/* Hardware Question */}
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    {HARDWARE_QUESTIONS[0].question}
-                  </label>
-                  <div className={styles.radioGroup}>
-                    {HARDWARE_QUESTIONS[0].options.map((option) => (
-                      <label key={option.value} className={styles.radioOption}>
-                        <input
-                          type="radio"
-                          name="hardware"
-                          value={option.value}
-                          checked={hardwareAnswer === option.value}
-                          onChange={(e) => setHardwareAnswer(e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Robotics Experience Question */}
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    {EXPERIENCE_QUESTIONS[0].question}
-                  </label>
-                  <div className={styles.radioGroup}>
-                    {EXPERIENCE_QUESTIONS[0].options.map((option) => (
-                      <label key={option.value} className={styles.radioOption}>
-                        <input
-                          type="radio"
-                          name="roboticsExperience"
-                          value={option.value}
-                          checked={roboticsExperience === option.value}
-                          onChange={(e) => setRoboticsExperience(e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Python Skill Question */}
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>
-                    {EXPERIENCE_QUESTIONS[1].question}
-                  </label>
-                  <div className={styles.radioGroup}>
-                    {EXPERIENCE_QUESTIONS[1].options.map((option) => (
-                      <label key={option.value} className={styles.radioOption}>
-                        <input
-                          type="radio"
-                          name="pythonSkill"
-                          value={option.value}
-                          checked={pythonSkill === option.value}
-                          onChange={(e) => setPythonSkill(e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.hint}>
-                  <p style={{ marginBottom: '8px' }}>
-                    <strong>Why we ask:</strong> We'll personalize code examples and explanations based on your answers.
-                  </p>
-                </div>
-              </>
-            )}
 
             {error && (
               <div className={styles.error}>
