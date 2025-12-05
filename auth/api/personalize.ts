@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * AI Content Personalization Endpoint
  *
  * Generates personalized educational content based on user's hardware and skill level
- * Uses OpenAI API to regenerate content tailored to the user's profile
+ * Uses Google Gemini 2.5 Flash to regenerate content tailored to the user's profile
  *
  * Usage: POST /api/personalize
  * Body: { pageContent: string, pageTitle: string, hardware_bg: string, skill_level: string }
@@ -77,7 +77,7 @@ Keep the core learning objectives the same but tailor the delivery to their prof
 
     // Call Gemini API to generate personalized content
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
@@ -126,7 +126,7 @@ Keep the core learning objectives the same but tailor the delivery to their prof
 }
 
 /**
- * Generate mock personalized content for testing (when OpenAI API key is not available)
+ * Generate mock personalized content for testing (when Gemini API key is not available)
  */
 function generateMockContent(pageTitle: string, hardware_bg: string, skill_level: string): string {
   return `<div>
@@ -144,7 +144,7 @@ ${getHardwareRecommendations(hardware_bg)}
 ${getSkillLevelContent(skill_level)}
 <div style="background: #fff3cd; padding: 16px; border-radius: 8px; margin: 16px 0;">
 <h4>💡 Pro Tip</h4>
-<p>This is a demo template response. To enable real AI-powered content generation with Google Gemini 2.0 Flash, configure the GEMINI_API_KEY environment variable in your Vercel deployment. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a></p>
+<p>This is a demo template response. To enable real AI-powered content generation with Google Gemini 2.5 Flash, configure the GEMINI_API_KEY environment variable in your Vercel deployment. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a></p>
 </div>
 </div>`;
 }
